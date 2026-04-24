@@ -31,10 +31,50 @@ function seededRng(seed: number) {
 const COLORS  = ["BLACK", "WHITE", "SILVER", "MIDNIGHT", "STARLIGHT", "BLUE", "GREEN", "RED", "GOLD", "SPACE GREY"];
 const SIZES   = ["S", "M", "L", "XL", "ONE SIZE"];
 
+const VENDOR_STYLE_DESCRIPTORS = [
+  "APPLE LB AIRPODS PRO GEN 3",
+  "APPLE MAGSAFE CHARGER 2",
+  "APPLE USB-C CABLE 2M",
+  "APPLE LIGHTNING ADAPTER",
+  "APPLE WATCH BAND SPORT",
+  "APPLE PENCIL TIP REPLACEMENT",
+  "APPLE SMART KEYBOARD COVER",
+  "APPLE TV SIRI REMOTE",
+  "APPLE HOMEPOD MINI SPEAKER",
+  "APPLE AIRTAG 4-PACK",
+  "INGRAM USB-C HUB 7-IN-1",
+  "INGRAM PORTABLE SSD 1TB",
+  "INGRAM WIRELESS CHARGER",
+  "INGRAM BLUETOOTH MOUSE",
+  "INGRAM LAPTOP STAND ALU",
+];
+
+interface VendorStyle { styleCode: string; styleDesc: string; }
+
+function generateVendorStyles(
+  vendorCode: string,
+  currentStyleCode: string,
+  currentStyleDesc: string,
+): VendorStyle[] {
+  const rng    = seededRng(hashStr(vendorCode + "STYLES"));
+  const count  = 6 + Math.floor(rng() * 5);
+  const descs  = [...VENDOR_STYLE_DESCRIPTORS].sort(() => rng() - 0.5).slice(0, count);
+  const others = descs.map((desc) => ({
+    styleCode: String(1000000 + (hashStr(vendorCode + desc) % 999999)),
+    styleDesc: desc,
+  }));
+  return [
+    { styleCode: currentStyleCode, styleDesc: currentStyleDesc },
+    ...others.filter((s) => s.styleCode !== currentStyleCode),
+  ];
+}
+
 interface SkuRow {
   upc:         string;
   variant:     string;
   description: string;
+  styleCode:   string;
+  styleDesc:   string;
   stock:       number;
   sales:       number;
   wos:         number;
@@ -68,6 +108,8 @@ function generateSkus(styleCode: string, storeName: string, styleDesc: string, v
       upc,
       variant,
       description: `${styleDesc} ${variant}`,
+      styleCode,
+      styleDesc,
       stock,
       sales,
       wos,
@@ -104,17 +146,38 @@ export default function StoreSkus() {
   const [sortCol, setSortCol]   = useState<string>("deficit");
   const [sortDir, setSortDir]   = useState<SortDir>("desc");
   const [showAllSkus, setShowAllSkus] = useState(false);
+  const [scope, setScope] = useState<"style" | "vendor">("style");
 
-  const allSkus = useMemo(
+  const styleSkus = useMemo(
     () => generateSkus(styleCode, storeName, styleDesc, vendorName, vendorCode),
-    [styleCode, storeName]
+    [styleCode, storeName, styleDesc, vendorName, vendorCode]
   );
+
+  const vendorStyles = useMemo(
+    () => generateVendorStyles(vendorCode, styleCode, styleDesc),
+    [vendorCode, styleCode, styleDesc],
+  );
+
+  const vendorSkus = useMemo(
+    () => vendorStyles.flatMap((st) =>
+      generateSkus(st.styleCode, storeName, st.styleDesc, vendorName, vendorCode)
+    ),
+    [vendorStyles, storeName, vendorName, vendorCode],
+  );
+
+  const allSkus = scope === "vendor" ? vendorSkus : styleSkus;
 
   const skuData = useMemo(() => {
     let rows = showAllSkus ? allSkus : allSkus.filter((s) => s.deficit > 0);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      rows = rows.filter((s) => s.upc.includes(q) || s.variant.toLowerCase().includes(q) || s.description.toLowerCase().includes(q));
+      rows = rows.filter((s) =>
+        s.upc.includes(q) ||
+        s.variant.toLowerCase().includes(q) ||
+        s.description.toLowerCase().includes(q) ||
+        s.styleCode.includes(q) ||
+        s.styleDesc.toLowerCase().includes(q)
+      );
     }
     if (sortCol && sortDir) {
       rows = [...rows].sort((a, b) => {
@@ -212,12 +275,50 @@ export default function StoreSkus() {
         <Card className="border-border/60 shadow-none">
           <CardContent className="p-3">
             <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Scope</label>
+                <div className="inline-flex rounded-md border border-slate-200 overflow-hidden bg-white" role="tablist">
+                  <button
+                    role="tab"
+                    aria-selected={scope === "style"}
+                    onClick={() => setScope("style")}
+                    className={cn(
+                      "px-3 h-8 text-[11px] font-semibold transition-colors inline-flex items-center gap-1.5",
+                      scope === "style"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-slate-600 hover:bg-slate-50"
+                    )}
+                  >
+                    <Package size={12} /> This Style
+                  </button>
+                  <button
+                    role="tab"
+                    aria-selected={scope === "vendor"}
+                    onClick={() => setScope("vendor")}
+                    className={cn(
+                      "px-3 h-8 text-[11px] font-semibold transition-colors inline-flex items-center gap-1.5 border-l border-slate-200",
+                      scope === "vendor"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-slate-600 hover:bg-slate-50"
+                    )}
+                  >
+                    All Vendor SKUs
+                    <Badge variant="outline" className={cn(
+                      "text-[9px] h-4 px-1 ml-0.5",
+                      scope === "vendor" ? "bg-white/20 text-primary-foreground border-white/30" : "bg-slate-100 text-slate-500 border-slate-200"
+                    )}>
+                      {vendorStyles.length}
+                    </Badge>
+                  </button>
+                </div>
+              </div>
               <div className="flex flex-col gap-1 min-w-[220px]">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Search SKU / Variant</label>
                 <div className="relative">
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                   <Input value={search} onChange={(e) => setSearch(e.target.value)}
-                    placeholder="UPC, colour or description…" className="h-8 pl-7 text-[11px] border-slate-200 bg-white" />
+                    placeholder={scope === "vendor" ? "UPC, style, colour…" : "UPC, colour or description…"}
+                    className="h-8 pl-7 text-[11px] border-slate-200 bg-white" />
                 </div>
               </div>
               <button
@@ -245,6 +346,9 @@ export default function StoreSkus() {
               <thead>
                 <tr className="bg-slate-50 border-b-2 border-border/50">
                   <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">UPC</th>
+                  {scope === "vendor" && (
+                    <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 whitespace-nowrap">Style</th>
+                  )}
                   <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">Variant</th>
                   <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 min-w-[200px]">Description</th>
                   <th className="px-3 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">Vendor</th>
@@ -275,14 +379,31 @@ export default function StoreSkus() {
               <tbody>
                 {skuData.map((sku, i) => {
                   const level = defLevel(sku.deficit);
+                  const isCurrentStyle = sku.styleCode === styleCode;
                   return (
-                    <tr key={sku.upc}
+                    <tr key={`${sku.styleCode}-${sku.upc}`}
                       className={cn(
                         "border-b border-border/20 transition-colors",
                         i % 2 === 0 ? "bg-background hover:bg-slate-50/60" : "bg-muted/[0.02] hover:bg-slate-50/60"
                       )}
                     >
                       <td className="px-4 py-2.5 font-mono text-[10px] text-slate-500 border-r border-border/20 whitespace-nowrap">{sku.upc}</td>
+                      {scope === "vendor" && (
+                        <td className="px-4 py-2.5 border-r border-border/20 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            <span className={cn(
+                              "font-mono text-[10px] font-semibold",
+                              isCurrentStyle ? "text-primary" : "text-slate-500"
+                            )}>{sku.styleCode}</span>
+                            {isCurrentStyle && (
+                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-primary/10 text-primary border-primary/30">selected</Badge>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate max-w-[200px]" title={sku.styleDesc}>
+                            {sku.styleDesc}
+                          </div>
+                        </td>
+                      )}
                       <td className="px-4 py-2.5 border-r border-border/20">
                         <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-slate-50 text-slate-700 border-slate-200 whitespace-nowrap">
                           {sku.variant}
@@ -327,7 +448,7 @@ export default function StoreSkus() {
 
                 {skuData.length === 0 && (
                   <tr>
-                    <td colSpan={11} className="py-12 text-center">
+                    <td colSpan={scope === "vendor" ? 12 : 11} className="py-12 text-center">
                       <Package size={28} className="mx-auto mb-2 text-slate-300" />
                       <p className="text-xs text-slate-400">
                         {showAllSkus ? "No SKUs found." : "No SKUs with deficit. Toggle to show all SKUs."}
@@ -339,7 +460,7 @@ export default function StoreSkus() {
                 {/* Totals row */}
                 {skuData.length > 0 && (
                   <tr className="border-t-2 border-border/50 bg-slate-50 font-semibold">
-                    <td colSpan={4} className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 border-r border-border/20">
+                    <td colSpan={scope === "vendor" ? 5 : 4} className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 border-r border-border/20">
                       Total ({skuData.length} SKUs)
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-700 border-r border-border/20">
