@@ -56,6 +56,13 @@ const WAREHOUSE_POOL = [
   { code: "DC-EAST",     name: "Norwich DC",      region: "East"     },
 ];
 
+// Must match StyleStores.assignWarehouse — keep in sync
+function assignWarehouse(storeName: string): string | null {
+  const h = hashStr(storeName + "WH");
+  if (h % 4 === 0) return null;
+  return WAREHOUSE_POOL[h % WAREHOUSE_POOL.length].code;
+}
+
 interface ServicedStore {
   storeId:   string;
   storeName: string;
@@ -75,12 +82,11 @@ function getServicedStores(styleCode: string, whCode: string): ServicedStore[] {
       const storeSales  = Math.floor(rng() * 30) + 3;
       const required    = Math.floor(storeSales * (rng() * 6 + 4) + presStock);
       const deficit     = required - storeOnhand;
-      const whIdx       = hashStr(s.name) % WAREHOUSE_POOL.length;
       return {
         storeId:   `S${String(100 + i).padStart(3, "0")}`,
         storeName: s.name,
         format:    s.format,
-        warehouse: WAREHOUSE_POOL[whIdx].code,
+        warehouse: assignWarehouse(s.name),
         deficit,
       };
     })

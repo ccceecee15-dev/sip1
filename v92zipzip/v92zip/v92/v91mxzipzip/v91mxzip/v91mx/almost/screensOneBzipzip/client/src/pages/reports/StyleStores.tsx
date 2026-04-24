@@ -54,7 +54,7 @@ const STORE_POOL = [
 ];
 
 // ─── Mock warehouse data ──────────────────────────────────────────────────────
-const WAREHOUSE_POOL = [
+export const WAREHOUSE_POOL = [
   { code: "DC-NORTH",    name: "Sheffield DC",      region: "North"    },
   { code: "DC-SOUTH",    name: "Reading DC",        region: "South"    },
   { code: "DC-MIDLANDS", name: "Birmingham DC",     region: "Midlands" },
@@ -69,11 +69,20 @@ const FORMAT_COLORS: Record<string, string> = {
   WTLV:      "bg-amber-50 text-amber-700 border-amber-200",
 };
 
-interface StoreRow {
+// Deterministic store→warehouse assignment.
+// Returns null when the store is direct-shipped (not serviced by a warehouse).
+export function assignWarehouse(storeName: string): string | null {
+  const h = hashStr(storeName + "WH");
+  // ~25% of stores ship direct from vendor
+  if (h % 4 === 0) return null;
+  return WAREHOUSE_POOL[h % WAREHOUSE_POOL.length].code;
+}
+
+interface StoreCalc {
   storeId:       string;
   storeName:     string;
   format:        string;
-  warehouseCode: string;
+  warehouseCode: string | null;
   presStock:     number;
   storeOnhand:   number;
   storeSales:    number;
@@ -83,18 +92,7 @@ interface StoreRow {
   suggestedQty:  number;
 }
 
-interface WarehouseRow {
-  code:           string;
-  name:           string;
-  region:         string;
-  storesServiced: number;
-  storesDeficit:  number;
-  whOnhand:       number;
-  totalDeficit:   number;
-  suggestedQty:   number;
-}
-
-function generateStores(styleCode: string): StoreRow[] {
+function generateStores(styleCode: string): StoreCalc[] {
   const rng   = seededRng(hashStr(styleCode));
   const count = 10 + Math.floor(rng() * 8); // 10–17 stores
   const pool  = [...STORE_POOL].sort(() => rng() - 0.5).slice(0, count);
@@ -108,13 +106,11 @@ function generateStores(styleCode: string): StoreRow[] {
     const deficit     = required - storeOnhand;
     const orderMult   = [6, 10, 12, 24][Math.floor(rng() * 4)];
     const suggestedQty = deficit > 0 ? Math.ceil(deficit / orderMult) * orderMult : 0;
-    // Deterministic store→warehouse assignment
-    const whIdx = hashStr(s.name) % WAREHOUSE_POOL.length;
     return {
       storeId:       `S${String(100 + i).padStart(3, "0")}`,
       storeName:     s.name,
       format:        s.format,
-      warehouseCode: WAREHOUSE_POOL[whIdx].code,
+      warehouseCode: assignWarehouse(s.name),
       presStock,
       storeOnhand,
       storeSales,
@@ -123,45 +119,95 @@ function generateStores(styleCode: string): StoreRow[] {
       deficit,
       suggestedQty,
     };
-  }).sort((a, b) => b.deficit - a.deficit); // default: highest deficit first
+  });
 }
 
-function aggregateWarehouses(stores: StoreRow[], styleCode: string): WarehouseRow[] {
-  const rng = seededRng(hashStr(styleCode + "WH"));
+// A delivery point is either a single direct-shipped store or an aggregated warehouse
+type DeliveryPoint =
+  | (StoreCalc & {
+      kind: "store";
+      pointId:   string;
+      pointName: string;
+      onhand:    number;
+      sales:     number;
+      wos:       number;
+      required:  number;
+    })
+  | {
+      kind:           "warehouse";
+      pointId:        string;     // warehouse code
+      pointName:      string;     // warehouse name
+      region:         string;
+      format:         string;     // "WAREHOUSE"
+      storesServiced: number;
+      storesDeficit:  number;
+      onhand:         number;     // WH onhand
+      sales:          number;     // Σ store sales
+      wos:            number;     // weighted WOS
+      required:       number;     // Σ required
+      deficit:        number;     // Σ deficit
+      suggestedQty:   number;
+    };
 
-  const byCode = new Map<string, StoreRow[]>();
+function buildDeliveryPoints(stores: StoreCalc[], styleCode: string): DeliveryPoint[] {
+  const rng = seededRng(hashStr(styleCode + "WHSTOCK"));
+  const points: DeliveryPoint[] = [];
+
+  // Direct stores → one row each
   for (const s of stores) {
+    if (s.warehouseCode === null) {
+      points.push({
+        ...s,
+        kind:      "store",
+        pointId:   s.storeId,
+        pointName: s.storeName,
+        onhand:    s.storeOnhand,
+        sales:     s.storeSales,
+        wos:       s.storeWos,
+        required:  s.requiredStock,
+      });
+    }
+  }
+
+  // Group warehouse-served stores by warehouse
+  const byCode = new Map<string, StoreCalc[]>();
+  for (const s of stores) {
+    if (s.warehouseCode === null) continue;
     const arr = byCode.get(s.warehouseCode) ?? [];
     arr.push(s);
     byCode.set(s.warehouseCode, arr);
   }
 
-  const rows: WarehouseRow[] = [];
   for (const wh of WAREHOUSE_POOL) {
     const list = byCode.get(wh.code);
     if (!list || list.length === 0) continue;
-    // Only surface warehouses that service multiple stores
-    if (list.length < 2) continue;
 
-    const totalDeficit = list.reduce((s, r) => s + Math.max(0, r.deficit), 0);
-    const suggestedQty = list.reduce((s, r) => s + r.suggestedQty, 0);
-    const storesDeficit = list.filter((r) => r.deficit > 0).length;
-    const whOnhand = Math.floor(rng() * 400) + 50;
+    const sales    = list.reduce((s, r) => s + r.storeSales, 0);
+    const required = list.reduce((s, r) => s + r.requiredStock, 0);
+    const onhand   = Math.floor(rng() * 400) + 50; // warehouse on-hand stock
+    const deficit  = Math.max(0, required - onhand);
+    const wos      = sales > 0 ? +(onhand / sales).toFixed(1) : 0;
+    const orderMult   = [12, 24, 48, 60][Math.floor(rng() * 4)];
+    const suggestedQty = deficit > 0 ? Math.ceil(deficit / orderMult) * orderMult : 0;
 
-    if (totalDeficit <= 0) continue;
-
-    rows.push({
-      code:           wh.code,
-      name:           wh.name,
+    points.push({
+      kind:           "warehouse",
+      pointId:        wh.code,
+      pointName:      wh.name,
       region:         wh.region,
+      format:         "WAREHOUSE",
       storesServiced: list.length,
-      storesDeficit,
-      whOnhand,
-      totalDeficit,
+      storesDeficit:  list.filter((r) => r.deficit > 0).length,
+      onhand,
+      sales,
+      wos,
+      required,
+      deficit,
       suggestedQty,
     });
   }
-  return rows.sort((a, b) => b.totalDeficit - a.totalDeficit);
+
+  return points.sort((a, b) => b.deficit - a.deficit);
 }
 
 function defLevel(v: number): "high" | "medium" | "none" {
@@ -183,22 +229,30 @@ export default function StyleStores() {
   const vendorCode = params.get("vendorCode") ?? "—";
 
   const [search, setSearch]     = useState("");
+  const [filterType, setFilterType] = useState("all"); // all | warehouse | store
   const [filterFormat, setFilterFormat] = useState("all");
   const [sortCol, setSortCol]   = useState<string>("deficit");
   const [sortDir, setSortDir]   = useState<SortDir>("desc");
 
   const allStores      = useMemo(() => generateStores(styleCode), [styleCode]);
-  const warehouseRows  = useMemo(() => aggregateWarehouses(allStores, styleCode), [allStores, styleCode]);
+  const deliveryPoints = useMemo(() => buildDeliveryPoints(allStores, styleCode), [allStores, styleCode]);
 
-  const formats = useMemo(() =>
-    Array.from(new Set(allStores.map((s) => s.format))).sort(), [allStores]);
+  const formats = useMemo(() => {
+    const set = new Set<string>();
+    for (const dp of deliveryPoints) set.add(dp.format);
+    return Array.from(set).sort();
+  }, [deliveryPoints]);
 
-  const storesData = useMemo(() => {
-    let rows = allStores;
-    if (filterFormat !== "all") rows = rows.filter((s) => s.format === filterFormat);
+  const tableData = useMemo(() => {
+    let rows = deliveryPoints;
+    if (filterType === "warehouse") rows = rows.filter((r) => r.kind === "warehouse");
+    if (filterType === "store")     rows = rows.filter((r) => r.kind === "store");
+    if (filterFormat !== "all")     rows = rows.filter((r) => r.format === filterFormat);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      rows = rows.filter((s) => s.storeName.toLowerCase().includes(q) || s.storeId.toLowerCase().includes(q));
+      rows = rows.filter(
+        (r) => r.pointName.toLowerCase().includes(q) || r.pointId.toLowerCase().includes(q),
+      );
     }
     if (sortCol && sortDir) {
       rows = [...rows].sort((a, b) => {
@@ -211,19 +265,23 @@ export default function StyleStores() {
       });
     }
     return rows;
-  }, [allStores, filterFormat, search, sortCol, sortDir]);
+  }, [deliveryPoints, filterType, filterFormat, search, sortCol, sortDir]);
 
-  const totals = useMemo(() => ({
-    deficit:  storesData.reduce((s, r) => s + Math.max(0, r.deficit), 0),
-    orderQty: storesData.reduce((s, r) => s + r.suggestedQty, 0),
-    stores:   storesData.filter((r) => r.deficit > 0).length,
-  }), [storesData]);
-
-  const warehouseTotals = useMemo(() => ({
-    count:    warehouseRows.length,
-    deficit:  warehouseRows.reduce((s, r) => s + r.totalDeficit, 0),
-    orderQty: warehouseRows.reduce((s, r) => s + r.suggestedQty, 0),
-  }), [warehouseRows]);
+  const totals = useMemo(() => {
+    const whCount     = deliveryPoints.filter((r) => r.kind === "warehouse").length;
+    const storeCount  = deliveryPoints.filter((r) => r.kind === "store").length;
+    const deficitPts  = deliveryPoints.filter((r) => r.deficit > 0).length;
+    return {
+      whCount,
+      storeCount,
+      deficitPts,
+      deficit:  tableData.reduce((s, r) => s + Math.max(0, r.deficit), 0),
+      orderQty: tableData.reduce((s, r) => s + r.suggestedQty, 0),
+      sales:    tableData.reduce((s, r) => s + r.sales, 0),
+      onhand:   tableData.reduce((s, r) => s + r.onhand, 0),
+      required: tableData.reduce((s, r) => s + r.required, 0),
+    };
+  }, [tableData, deliveryPoints]);
 
   const handleSort = (col: string) => {
     if (sortCol !== col) { setSortCol(col); setSortDir("desc"); }
@@ -239,27 +297,27 @@ export default function StyleStores() {
     </span>
   );
 
-  const navigateToSkus = (store: StoreRow) => {
-    navigate(
-      `/reports/sip-planning/store-skus?style=${styleCode}` +
-      `&desc=${encodeURIComponent(styleDesc)}` +
-      `&store=${encodeURIComponent(store.storeName)}` +
-      `&storeId=${store.storeId}` +
-      `&vendor=${encodeURIComponent(vendorName)}` +
-      `&vendorCode=${vendorCode}`
-    );
-  };
-
-  const navigateToWarehouse = (wh: WarehouseRow) => {
-    navigate(
-      `/reports/sip-planning/warehouse-skus?style=${styleCode}` +
-      `&desc=${encodeURIComponent(styleDesc)}` +
-      `&wh=${encodeURIComponent(wh.code)}` +
-      `&whName=${encodeURIComponent(wh.name)}` +
-      `&region=${encodeURIComponent(wh.region)}` +
-      `&vendor=${encodeURIComponent(vendorName)}` +
-      `&vendorCode=${vendorCode}`
-    );
+  const navigateToPoint = (dp: DeliveryPoint) => {
+    if (dp.kind === "warehouse") {
+      navigate(
+        `/reports/sip-planning/warehouse-skus?style=${styleCode}` +
+        `&desc=${encodeURIComponent(styleDesc)}` +
+        `&wh=${encodeURIComponent(dp.pointId)}` +
+        `&whName=${encodeURIComponent(dp.pointName)}` +
+        `&region=${encodeURIComponent(dp.region)}` +
+        `&vendor=${encodeURIComponent(vendorName)}` +
+        `&vendorCode=${vendorCode}`
+      );
+    } else {
+      navigate(
+        `/reports/sip-planning/store-skus?style=${styleCode}` +
+        `&desc=${encodeURIComponent(styleDesc)}` +
+        `&store=${encodeURIComponent(dp.storeName)}` +
+        `&storeId=${dp.storeId}` +
+        `&vendor=${encodeURIComponent(vendorName)}` +
+        `&vendorCode=${vendorCode}`
+      );
+    }
   };
 
   return (
@@ -276,7 +334,7 @@ export default function StyleStores() {
           </button>
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div className="min-w-0">
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">Network Deficit</h1>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900">Delivery Points</h1>
               <p className="text-sm text-slate-500 mt-0.5 truncate max-w-xl">
                 Style <span className="font-mono font-bold text-primary">{styleCode}</span> — {styleDesc}
               </p>
@@ -288,10 +346,11 @@ export default function StyleStores() {
         {/* Summary pills */}
         <div className="flex flex-wrap gap-3">
           {[
-            { label: "Warehouses with deficit", value: warehouseTotals.count, color: "text-indigo-700 bg-indigo-50 border-indigo-200" },
-            { label: "Stores with deficit",     value: totals.stores, color: "text-red-600 bg-red-50 border-red-200" },
-            { label: "Total deficit units",     value: totals.deficit.toLocaleString(), color: "text-orange-600 bg-orange-50 border-orange-200" },
-            { label: "Units to order",          value: totals.orderQty.toLocaleString(), color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+            { label: "Warehouses",          value: totals.whCount,    color: "text-indigo-700 bg-indigo-50 border-indigo-200" },
+            { label: "Direct stores",       value: totals.storeCount, color: "text-slate-700 bg-slate-50 border-slate-200" },
+            { label: "Points with deficit", value: totals.deficitPts, color: "text-red-600 bg-red-50 border-red-200" },
+            { label: "Total deficit units", value: totals.deficit.toLocaleString(),  color: "text-orange-600 bg-orange-50 border-orange-200" },
+            { label: "Units to order",      value: totals.orderQty.toLocaleString(), color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
           ].map(({ label, value, color }) => (
             <div key={label} className={cn("flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-semibold", color)}>
               {label}: <span className="text-sm font-bold">{value}</span>
@@ -299,104 +358,21 @@ export default function StyleStores() {
           ))}
         </div>
 
-        {/* Warehouses section */}
-        {warehouseRows.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Warehouse size={14} className="text-indigo-600" />
-                <h2 className="text-sm font-bold tracking-tight text-slate-800">
-                  Warehouses with deficit
-                </h2>
-                <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-indigo-50 text-indigo-700 border-indigo-200">
-                  {warehouseRows.length}
-                </Badge>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Servicing multiple stores · click to view aggregated SKU deficit
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {warehouseRows.map((wh) => {
-                const level = defLevel(wh.totalDeficit);
-                return (
-                  <Card
-                    key={wh.code}
-                    onClick={() => navigateToWarehouse(wh)}
-                    className={cn(
-                      "border shadow-none cursor-pointer transition-all hover:shadow-md hover:border-indigo-300 group",
-                      level === "high" ? "border-red-200" : level === "medium" ? "border-orange-200" : "border-border/60",
-                    )}
-                  >
-                    <CardContent className="p-3.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <Warehouse size={12} className="text-indigo-500 flex-shrink-0" />
-                            <span className="font-mono text-[10px] text-slate-400">{wh.code}</span>
-                          </div>
-                          <h3 className="text-sm font-semibold text-slate-800 mt-1 truncate group-hover:text-indigo-700 transition-colors">
-                            {wh.name}
-                          </h3>
-                          <p className="text-[10px] text-slate-400 mt-0.5">{wh.region} region</p>
-                        </div>
-                        <ArrowRight size={14} className="text-slate-300 group-hover:text-indigo-500 transition-colors mt-0.5 flex-shrink-0" />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border/30">
-                        <div>
-                          <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Stores</p>
-                          <p className="text-sm font-bold text-slate-700 mt-0.5">
-                            {wh.storesDeficit}<span className="text-[10px] text-slate-400 font-normal">/{wh.storesServiced}</span>
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">WH Stock</p>
-                          <p className="text-sm font-bold text-slate-700 mt-0.5 tabular-nums">{wh.whOnhand.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Deficit</p>
-                          <p className={cn(
-                            "text-sm font-bold mt-0.5 tabular-nums",
-                            level === "high" ? "text-red-600" : level === "medium" ? "text-orange-600" : "text-slate-600",
-                          )}>
-                            {wh.totalDeficit.toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Sugg. Qty</p>
-                          <p className="text-sm font-bold text-primary mt-0.5 tabular-nums">{wh.suggestedQty.toLocaleString()}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Stores section header */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2">
-            <Store size={14} className="text-slate-600" />
-            <h2 className="text-sm font-bold tracking-tight text-slate-800">
-              Stores with deficit
-            </h2>
-            <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-slate-50 text-slate-700 border-slate-200">
-              {totals.stores}
-            </Badge>
-          </div>
-          <p className="text-[11px] text-slate-400">
-            Click any row to drill into SKU-level detail
-          </p>
-        </div>
-
         {/* Filters */}
         <Card className="border-border/60 shadow-none">
           <CardContent className="p-3">
             <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-col gap-1 min-w-[150px]">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Type</label>
+                <Select value={filterType} onValueChange={setFilterType}>
+                  <SelectTrigger className="h-8 text-[11px] border-slate-200 bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all"       className="text-[11px]">All Delivery Points</SelectItem>
+                    <SelectItem value="warehouse" className="text-[11px]">Warehouses</SelectItem>
+                    <SelectItem value="store"     className="text-[11px]">Direct Stores</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex flex-col gap-1 min-w-[150px]">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Format</label>
                 <Select value={filterFormat} onValueChange={setFilterFormat}>
@@ -408,15 +384,15 @@ export default function StyleStores() {
                 </Select>
               </div>
               <div className="flex flex-col gap-1 min-w-[220px]">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Search Store</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Search</label>
                 <div className="relative">
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                   <Input value={search} onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Store name or ID…" className="h-8 pl-7 text-[11px] border-slate-200 bg-white" />
+                    placeholder="Name or ID…" className="h-8 pl-7 text-[11px] border-slate-200 bg-white" />
                 </div>
               </div>
               <Button size="sm" variant="outline" className="h-8 text-[11px]"
-                onClick={() => { setSearch(""); setFilterFormat("all"); }}>
+                onClick={() => { setSearch(""); setFilterFormat("all"); setFilterType("all"); }}>
                 Clear
               </Button>
             </div>
@@ -429,17 +405,18 @@ export default function StyleStores() {
             <table className="text-xs w-full border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b-2 border-border/50">
-                  <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 w-24">Store ID</th>
-                  <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">Store Name</th>
-                  <th className="px-3 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">Format</th>
-                  <th className="px-3 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 whitespace-nowrap">Warehouse</th>
+                  <th className="px-3 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 w-24">Type</th>
+                  <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 w-24">ID</th>
+                  <th className="px-4 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">Delivery Point</th>
+                  <th className="px-3 py-2.5 text-left font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20">Format / Region</th>
+                  <th className="px-3 py-2.5 text-right font-semibold text-[10px] uppercase tracking-wide text-slate-500 border-r border-border/20 whitespace-nowrap">Stores Serviced</th>
                   {[
-                    { col: "storeOnhand",   label: "Store Stock" },
-                    { col: "storeSales",    label: "Store Sales" },
-                    { col: "storeWos",      label: "WOS" },
-                    { col: "requiredStock", label: "Required" },
-                    { col: "deficit",       label: "Deficit" },
-                    { col: "suggestedQty",  label: "Suggested Qty" },
+                    { col: "onhand",       label: "Stock"        },
+                    { col: "sales",        label: "Sales"        },
+                    { col: "wos",          label: "WOS"          },
+                    { col: "required",     label: "Required"     },
+                    { col: "deficit",      label: "Deficit"      },
+                    { col: "suggestedQty", label: "Suggested Qty" },
                   ].map(({ col, label }) => (
                     <th key={col}
                       onClick={() => handleSort(col)}
@@ -457,78 +434,115 @@ export default function StyleStores() {
                 </tr>
               </thead>
               <tbody>
-                {storesData.map((store, i) => {
-                  const level = defLevel(store.deficit);
+                {tableData.map((dp, i) => {
+                  const level = defLevel(dp.deficit);
+                  const isWh  = dp.kind === "warehouse";
                   return (
                     <tr
-                      key={store.storeId}
-                      onClick={() => navigateToSkus(store)}
+                      key={`${dp.kind}-${dp.pointId}`}
+                      onClick={() => navigateToPoint(dp)}
                       className={cn(
                         "border-b border-border/20 cursor-pointer transition-colors group",
-                        i % 2 === 0 ? "hover:bg-primary/5 bg-background" : "hover:bg-primary/5 bg-muted/[0.02]"
+                        isWh ? "bg-indigo-50/30 hover:bg-indigo-50/70"
+                             : i % 2 === 0 ? "hover:bg-primary/5 bg-background" : "hover:bg-primary/5 bg-muted/[0.02]",
                       )}
                     >
-                      <td className="px-4 py-2.5 font-mono text-[10px] text-slate-500 border-r border-border/20">{store.storeId}</td>
+                      <td className="px-3 py-2.5 border-r border-border/20">
+                        {isWh ? (
+                          <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-indigo-50 text-indigo-700 border-indigo-200 gap-1 font-semibold">
+                            <Warehouse size={10} /> Warehouse
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-slate-50 text-slate-700 border-slate-200 gap-1 font-semibold">
+                            <Store size={10} /> Direct Store
+                          </Badge>
+                        )}
+                      </td>
+                      <td className={cn("px-4 py-2.5 font-mono text-[10px] border-r border-border/20",
+                        isWh ? "text-indigo-600 font-semibold" : "text-slate-500"
+                      )}>
+                        {dp.pointId}
+                      </td>
                       <td className="px-4 py-2.5 border-r border-border/20">
                         <div className="flex items-center gap-2">
-                          <Store size={12} className="text-slate-400 flex-shrink-0" />
-                          <span className="font-medium text-slate-700 group-hover:text-primary transition-colors">{store.storeName}</span>
-                          <ArrowRight size={11} className="text-slate-300 group-hover:text-primary/60 transition-colors" />
+                          {isWh
+                            ? <Warehouse size={12} className="text-indigo-500 flex-shrink-0" />
+                            : <Store size={12} className="text-slate-400 flex-shrink-0" />}
+                          <span className={cn(
+                            "font-medium transition-colors",
+                            isWh ? "text-indigo-800 group-hover:text-indigo-900" : "text-slate-700 group-hover:text-primary",
+                          )}>
+                            {dp.pointName}
+                          </span>
+                          <ArrowRight size={11} className={cn(
+                            "transition-colors",
+                            isWh ? "text-indigo-300 group-hover:text-indigo-600" : "text-slate-300 group-hover:text-primary/60",
+                          )} />
                         </div>
                       </td>
                       <td className="px-3 py-2.5 border-r border-border/20">
-                        <Badge variant="outline" className={cn("text-[10px] h-5 px-1.5", FORMAT_COLORS[store.format] ?? "bg-slate-100 text-slate-600")}>
-                          {store.format}
-                        </Badge>
+                        {isWh ? (
+                          <span className="text-[10px] text-slate-500">{dp.region} region</span>
+                        ) : (
+                          <Badge variant="outline" className={cn("text-[10px] h-5 px-1.5", FORMAT_COLORS[dp.format] ?? "bg-slate-100 text-slate-600")}>
+                            {dp.format}
+                          </Badge>
+                        )}
                       </td>
-                      <td className="px-3 py-2.5 border-r border-border/20">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-mono text-slate-500">
-                          <Warehouse size={10} className="text-indigo-400" />
-                          {store.warehouseCode}
-                        </span>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-[11px] border-r border-border/20">
+                        {isWh ? (
+                          <span className="font-semibold text-slate-700">
+                            {dp.storesDeficit}
+                            <span className="text-slate-400 font-normal">/{dp.storesServiced}</span>
+                          </span>
+                        ) : (
+                          <span className="text-slate-300">—</span>
+                        )}
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 border-r border-border/20">{store.storeOnhand.toLocaleString()}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 border-r border-border/20">{store.storeSales.toLocaleString()}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 border-r border-border/20">{dp.onhand.toLocaleString()}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 border-r border-border/20">{dp.sales.toLocaleString()}</td>
                       <td className={cn("px-4 py-2.5 text-right tabular-nums border-r border-border/20",
-                        store.storeWos < 2 ? "text-red-500 font-semibold" : "text-slate-600"
-                      )}>{store.storeWos}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-500 border-r border-border/20">{store.requiredStock.toLocaleString()}</td>
+                        dp.wos < 2 ? "text-red-500 font-semibold" : "text-slate-600"
+                      )}>{dp.wos}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-500 border-r border-border/20">{dp.required.toLocaleString()}</td>
                       <td className={cn("px-4 py-2.5 text-right tabular-nums font-bold border-r border-border/20",
                         level === "high" ? "text-red-600 bg-red-50/60" : level === "medium" ? "text-orange-500 bg-orange-50/40" : "text-slate-400"
                       )}>
-                        {store.deficit > 0 ? store.deficit.toLocaleString() : <span className="text-emerald-600 font-medium text-[10px]">OK</span>}
+                        {dp.deficit > 0 ? dp.deficit.toLocaleString() : <span className="text-emerald-600 font-medium text-[10px]">OK</span>}
                       </td>
                       <td className={cn("px-4 py-2.5 text-right tabular-nums font-bold",
-                        store.suggestedQty > 0 ? "text-primary" : "text-slate-300"
+                        dp.suggestedQty > 0 ? "text-primary" : "text-slate-300"
                       )}>
-                        {store.suggestedQty > 0 ? store.suggestedQty.toLocaleString() : "—"}
+                        {dp.suggestedQty > 0 ? dp.suggestedQty.toLocaleString() : "—"}
                       </td>
                     </tr>
                   );
                 })}
 
-                {storesData.length === 0 && (
+                {tableData.length === 0 && (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-xs text-slate-400">
-                      No stores match your filters.
+                    <td colSpan={11} className="py-12 text-center text-xs text-slate-400">
+                      No delivery points match your filters.
                     </td>
                   </tr>
                 )}
 
                 {/* Totals row */}
-                {storesData.length > 0 && (
+                {tableData.length > 0 && (
                   <tr className="border-t-2 border-border/50 bg-slate-50 font-semibold">
-                    <td colSpan={4} className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 border-r border-border/20">
-                      Total ({storesData.length} stores)
+                    <td colSpan={5} className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 border-r border-border/20">
+                      Total ({tableData.length} delivery points)
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-700 border-r border-border/20">
-                      {storesData.reduce((s, r) => s + r.storeOnhand, 0).toLocaleString()}
+                      {totals.onhand.toLocaleString()}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-700 border-r border-border/20">
-                      {storesData.reduce((s, r) => s + r.storeSales, 0).toLocaleString()}
+                      {totals.sales.toLocaleString()}
                     </td>
                     <td className="px-4 py-2.5 border-r border-border/20" />
-                    <td className="px-4 py-2.5 border-r border-border/20" />
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-700 border-r border-border/20">
+                      {totals.required.toLocaleString()}
+                    </td>
                     <td className="px-4 py-2.5 text-right tabular-nums font-bold text-red-700 border-r border-border/20">
                       {totals.deficit.toLocaleString()}
                     </td>
@@ -543,7 +557,7 @@ export default function StyleStores() {
         </Card>
 
         <p className="text-[11px] text-muted-foreground">
-          Click a <strong>warehouse</strong> to see aggregated SKU deficit across the stores it services and create a vendor PO. Click a <strong>store</strong> row to drill into its SKU-level detail.
+          This table lists every <strong>delivery point</strong> for this style — warehouses (which aggregate the stores they service) and direct-shipped stores. Stores serviced by a warehouse roll up into their warehouse row and don't appear separately. Click a row to drill into its SKU detail.
         </p>
       </div>
     </MainLayout>
