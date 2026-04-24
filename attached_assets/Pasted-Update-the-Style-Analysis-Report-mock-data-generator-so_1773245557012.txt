@@ -1,0 +1,209 @@
+Update the **Style Analysis Report mock data generator** so that it produces **realistic retail merchandising data based on the following example records** rather than random placeholder values.
+
+The generated rows should follow similar **value ranges, formatting, and relationships between fields** as the examples below.
+
+Example records:
+
+1
+Rank: 1
+Top Bucket: Top 100
+Style Code: 1334746
+Style Long Desc: APPLE LB AIRPODS PRO GEN 3 TRUE WIRELESS IN EAR EARBUDS
+Brand: APPLE
+UPC Number: 195950543698
+Style Chain Current Retail: $299.99
+Primary Vendor Code: 011286
+Primary Vendor Name: INGRAM MICRO, INC.
+Primary Vendor Style: MFHP4LL/A
+RTV Attribute: NOT RETURNABLE
+Style Reorderable Flag: 1
+Primary Current Cost: $232.00
+
+Sales Units
+WTD: 1229
+LW: 1058
+L2W: 975
+L3W: 1071
+
+Stock Units
+Presentation Stock: 2504
+Store Onhand: 1929
+Store Intransit: 1557
+DC Onhand: 12880
+DC Allocation: 6359
+
+WOS
+Store WOS: 3.22
+WH WOS: 11.89
+
+Store Availability
+Availability OH %: 69%
+WOW Availability Change: 3%
+
+Promotion
+Style Price Status Code: REG
+Style Price Status Description: REGULAR
+
+Orders
+Style Order Multiple: 20
+Style Distribution Multiple: 10
+First Receipt Date: 16-09-2025
+Last Receipt Date: 13-02-2026
+On Order Units (Total): 4300
+
+Sales by Store
+Count of Stores With Pres Stock: 142
+Sales Units Per Store (1 Week Ago): 8.65
+Sales Units Per Store (2 Weeks Ago): 7.45
+Sales Units Per Store (3 Weeks Ago): 6.87
+Sales Units Per Store (4 Weeks Ago): 7.54
+Sales Units Per Store (4 Weeks Summed): 30.51
+
+---
+
+# Mock Data Rules
+
+Generate **200–500 rows** following these realistic patterns.
+
+### Product Attributes
+
+Brands should include:
+
+* APPLE
+* BOSE
+* SONY
+* JBL
+* SAMSUNG
+* ANKER
+
+Style descriptions should resemble real electronics accessories such as:
+
+* wireless earbuds
+* over-ear headphones
+* charging accessories
+* speakers
+
+Retail prices should typically fall within:
+
+* $20 – $400
+
+Costs should be roughly **50–80% of retail price**.
+
+---
+
+### Sales Units
+
+Weekly sales values should follow realistic retail patterns:
+
+WTD
+Range: 50 – 6000
+
+LW / L2W / L3W
+Should be within **±25% of WTD**
+
+Avg Weekly Sales
+Range: 100 – 1500
+
+Total Year Sales
+Range: 500 – 15000
+
+---
+
+### Stock Units
+
+Typical ranges:
+
+Presentation Stock
+100 – 6000
+
+Store Onhand
+200 – 12000
+
+Store Intransit
+100 – 8000
+
+DC Onhand
+1000 – 25000
+
+DC Allocation
+500 – 15000
+
+---
+
+### WOS (Weeks of Supply)
+
+Store WOS
+2 – 10
+
+WH WOS
+4 – 15
+
+---
+
+### Store Availability
+
+Availability OH %
+65% – 95%
+
+WOW Availability Change
+-3% – +5%
+
+---
+
+### Promotion
+
+Price Status Code values:
+
+* REG
+* PROMO
+* CLEAR
+
+Price Status Description values:
+
+* REGULAR
+* PROMOTION
+* CLEARANCE
+
+---
+
+### Orders
+
+Style Order Multiple
+2 – 20
+
+Style Distribution Multiple
+2 – 10
+
+First Receipt Date
+Random within last 2 years
+
+Last Receipt Date
+After First Receipt Date
+
+On Order Units
+0 – 5000
+
+---
+
+### Sales by Store
+
+Count of Stores With Pres Stock
+50 – 300
+
+Sales Units Per Store (weekly)
+1.0 – 30.0
+
+4 Week Summed value should equal approximately the sum of the four weekly values.
+
+---
+
+### Formatting Rules
+
+* Currency should display with `$`
+* Percentages should display with `%`
+* Numeric values should include thousands separators where appropriate
+* Dates should follow **DD-MM-YYYY**
+
+---
+
+The goal is for the Style Analysis report to display **plausible retail merchandising data**, similar to the Apple AirPods and Bose headphone examples provided, so the table behaves realistically during testing.

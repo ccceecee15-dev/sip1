@@ -1,0 +1,210 @@
+Add a new **Reports → Exit Planning** screen to the existing application.
+
+The UI must use the **same layout, typography, table component, filters, and styling already used across the application** so that the screen feels consistent with the existing reports module.
+
+This screen will replicate the **Exit Planning Excel report**, which summarizes inventory aging by **MA (Merchandise Area)**.
+
+The report must support **three table views** that match the Excel sheet:
+
+1. Total Stock Aging
+2. EOL Aging
+3. Markdown Aging (MR1–MR4)
+
+Users should be able to switch between these views using **tabs above the table**.
+
+---
+
+# Screen Header
+
+Title: **Exit Planning**
+
+Right side actions:
+
+Export to Excel
+Reset Filters
+
+---
+
+# Filters
+
+Place a small filter panel above the report.
+
+Filters should include:
+
+Merchandise Area (MA)
+Category
+Sub Category
+Brand
+
+Buttons:
+
+Apply Filters
+Clear Filters
+
+---
+
+# View Tabs
+
+Add three tabs above the table.
+
+Total Stock Aging
+EOL Aging
+Markdown Aging
+
+Switching tabs should update the table columns.
+
+---
+
+# Table Layout
+
+The first column must always be:
+
+MA
+
+All currency values must be formatted with **$ and thousands separators**.
+
+---
+
+# View 1 — Total Stock Aging
+
+Columns must exactly match the sheet:
+
+MA
+Stock ($)
+6M
+12M
+24M
+Unknown
+
+Example row:
+
+CONNECT
+$24,02,663.21
+$23,91,005.91
+$5,559.05
+$5,977.44
+$120.81
+
+---
+
+# View 2 — EOL Aging
+
+Columns:
+
+MA
+EOL ($)
+within 3M
+Older 3M
+Unknown EOL
+
+Example row:
+
+CONNECT
+$3,54,633.01
+$88,154.08
+$2,66,478.93
+$0.00
+
+---
+
+# View 3 — Markdown Aging
+
+This view should include **all markdown stages (MR1–MR4)** exactly as in the Excel sheet.
+
+Columns:
+
+MA
+Total Clearance ($)
+
+MR1
+within 1M
+Older 1M
+Unknown MR1
+
+MR2
+within 1M
+Older 1M
+Unknown MR2
+
+MR3
+within 1M
+Older 1M
+Unknown MR3
+
+MR4
+within 1M
+Older 1M
+Unknown MR4
+
+Example row:
+
+CONNECT
+$2,62,529.27
+
+MR1 $1,58,698.04
+within 1M $0.00
+Older 1M $1,58,651.02
+Unknown MR1 $47.02
+
+MR2 $44,276.54
+within 1M $0.00
+Older 1M $44,288.21
+Unknown MR2 -$11.67
+
+MR3 $42,504.17
+within 1M $0.00
+Older 1M $42,435.25
+Unknown MR3 $68.92
+
+MR4 $17,050.52
+within 1M $0.00
+Older 1M $107.59
+Unknown MR4 $16,942.93
+
+---
+
+# Table Features
+
+Because some views contain many columns:
+
+Enable horizontal scrolling
+Keep **MA column frozen**
+Enable sorting on all numeric columns
+
+---
+
+# Pagination
+
+Add pagination at the bottom.
+
+Rows per page:
+
+25
+50
+100
+
+Include page navigation.
+
+---
+
+# Export
+
+Export to Excel must include:
+
+The currently selected tab
+All visible columns
+Currency formatting
+
+---
+
+# Empty State
+
+If no data matches filters display:
+
+"No exit planning data available for the selected filters."
+
+Include a **Clear Filters** button.
+
+---
+
+The goal of this screen is to replicate the **Exit Planning Excel summary report**, allowing planners to quickly analyze **stock aging, EOL inventory, and markdown exposure by Merchandise Area**.

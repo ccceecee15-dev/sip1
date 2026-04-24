@@ -1,0 +1,211 @@
+Enhance the existing application by creating a **new SIP workspace based on the current Style Analysis screen**, without modifying the original screen.
+
+---
+
+# Step 1 — Duplicate Existing Screen
+
+Create a new screen:
+
+**Reports → SIP Planning**
+
+This screen must be a **full duplicate of the existing Style Analysis screen**, including:
+
+* Filters
+* Column grouping
+* Table behavior
+* Custom views (Save View)
+* Pagination
+* Export
+
+Do NOT modify the original Style Analysis screen.
+
+---
+
+# Step 2 — Position SIP Planning as an Actionable Workspace
+
+This new screen should function as both:
+
+* Analytical tool (like Style Analysis)
+* Decision-making layer for ordering
+
+---
+
+# Step 3 — Add Deficit / Need Indicators
+
+Introduce new computed columns (add as a new column group):
+
+**SIP Metrics**
+
+* Forecast Demand (if available or mock)
+* Required Stock
+* Current Stock (reuse existing)
+* Deficit (Required - Current)
+* Suggested Order Qty
+
+Rules:
+
+* Deficit should highlight negative stock situations
+* Suggested Order Qty should reflect deficit (can be mock logic for now)
+
+Apply conditional formatting:
+
+* High deficit → red
+* Medium deficit → orange
+* No deficit → neutral
+
+---
+
+# Step 4 — Add Drill-Down Capability
+
+Enable row-level drill-down directly within the table.
+
+### Interaction:
+
+When user clicks a **Style row**:
+
+Expand inline OR open a new screen showing:
+
+### Level 1: Store-Level Breakdown
+
+Columns:
+
+Store
+Store Stock
+Store Sales
+Store WOS
+Deficit
+
+---
+
+### Level 2 (Optional expansion):
+
+Allow further drill-down into:
+
+SKU within Store
+
+---
+
+# Step 5 — Add “View Deficit Breakdown” Action
+
+Add an action button on each row or top toolbar:
+
+**“View Deficit by Location”**
+
+This opens a new screen:
+
+---
+
+# Step 6 — Location-Level Deficit Screen
+
+This screen reorganizes data by:
+
+Vendor + Location
+
+Columns:
+
+Vendor
+Location (Warehouse / Store)
+Total Deficit
+Total Suggested Order Qty
+Number of Styles Impacted
+
+Allow grouping:
+
+* By Vendor
+* Then by Location
+
+---
+
+# Step 7 — Add “Create PO” Flow
+
+From the Location-Level screen:
+
+Add button:
+
+**“Create PO”**
+
+---
+
+### PO Creation Screen
+
+This screen shows:
+
+Vendor
+Location
+
+And a table:
+
+Style
+Suggested Qty
+Editable Qty
+MOQ (if mock)
+Order Multiple
+
+Features:
+
+* Editable quantities
+* Select/deselect styles
+* Total order quantity summary
+
+---
+
+# Step 8 — Maintain Planning Logic
+
+Ensure the system behaves as:
+
+* Style Analysis identifies **what needs ordering**
+* Location screen determines **where to order**
+* PO screen determines **how much to order**
+
+---
+
+# Step 9 — Sorting & Prioritization
+
+In SIP Planning screen:
+
+Default sort:
+
+* Highest Deficit first
+
+Allow sorting by:
+
+* Deficit
+* Sales
+* Rank
+
+---
+
+# Step 10 — Preserve Flexibility
+
+Do NOT restrict:
+
+* Column customization
+* Saved views
+* Filters
+
+Users should still be able to:
+
+* Create multiple views
+* Choose their own analysis approach
+
+---
+
+# Step 11 — UI Consistency
+
+* Use same table, filters, and layout as Style Analysis
+* Keep grouped columns intact
+* Maintain performance for large datasets
+
+---
+
+# Goal
+
+Transform Style Analysis into a **flexible SIP planning workspace**, where users can:
+
+1. Analyze styles
+2. Identify shortages
+3. Drill into root causes
+4. Transition into ordering
+5. Generate purchase orders
+
+Without introducing a completely separate UI paradigm.

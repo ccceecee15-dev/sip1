@@ -1,0 +1,272 @@
+Add a new **Reports → Exit Planning** screen to the existing application.
+
+The UI must follow the **same layout, table components, filter design, spacing, and styling already used across the app** so it feels like part of the existing product.
+
+The Exit Planning screen will use the **same dataset as Style Analysis**, but focused on identifying styles that may need **inventory exit or clearance planning**.
+
+IMPORTANT: **All columns from the Excel dataset must be available in this screen**, even if some are hidden by default.
+
+---
+
+# Screen Header
+
+Title: **Exit Planning**
+
+Right side actions:
+
+* Export to Excel
+* Save View
+* Reset Filters
+
+---
+
+# Filters Section
+
+Place the filters at the top using the same filter component used in other report screens.
+
+Filters:
+
+Category
+Sub Category
+Brand
+Vendor
+PLC Status
+Top Bucket
+Style Code / Style Name (search)
+Weeks of Supply Range
+Store Availability %
+First Receipt Date
+Last Receipt Date
+
+Buttons:
+
+Apply Filters
+Clear Filters
+
+---
+
+# Summary Metrics
+
+Display summary cards above the table.
+
+Cards:
+
+Styles in Exit Candidate Pool
+Total Units at Risk
+Total Inventory Value
+Average Store WOS
+Average Store Availability %
+
+These values should update dynamically based on the filtered dataset.
+
+---
+
+# Exit Buckets
+
+Add quick filter tabs to help planners identify potential exit items.
+
+Buckets should be calculated using **Store WOS**:
+
+Monitor → WOS 6–8
+Slow Moving → WOS 8–12
+Exit Candidate → WOS 12–20
+Immediate Exit → WOS greater than 20
+
+Selecting a bucket should filter the table.
+
+---
+
+# Results Table
+
+The results table must support **grouped column headers**, matching the Excel dataset structure.
+
+All columns below must be included in the table configuration.
+
+---
+
+## Product Attribute
+
+Rank
+Top Bucket
+Style Code
+Style Long Desc
+Brand
+UPC Number – Vendor (Latest UPC only)
+Style Chain Current Retail
+Primary Vendor Code
+Primary Vendor Name
+Primary Vendor Style
+PLC Status
+RTV ATTRIBUTE
+Style Reorderable Flag
+Style Chain Current Retail
+Primary Current Cost
+
+---
+
+## Logistics
+
+Style Height
+Style Width
+Style Depth
+Style Weight
+
+---
+
+## Sales Units
+
+WTD
+LW
+L2W
+L3W
+L4W
+Avg Weekly Sales
+Total Year Sales
+
+---
+
+## Stock Units
+
+Presentation Stock
+Store Onhand
+Store Intransit
+DC Onhand
+DC Allocation
+
+---
+
+## WOS
+
+Store WOS
+WH WOS
+
+---
+
+## Store Availability
+
+Availability OH %
+WOW Availability Change
+
+---
+
+## Promotion
+
+Style Price Status Code
+Style Price Status Description
+Style Promo Flag
+
+---
+
+## Orders
+
+Style Order Multiple
+Style Distribution Multiple
+First Receipt Date
+Last Receipt Date
+GR Units (Last 8 weeks)
+On Order Units (Last 8 Weeks)
+On Order Units (Total)
+
+---
+
+## Sales by Store
+
+Count of Stores With Pres Stock
+Sales Units Per Store (1 Week Ago)
+Sales Units Per Store (2 Weeks Ago)
+Sales Units Per Store (3 Weeks Ago)
+Sales Units Per Store (4 Weeks Ago)
+Sales Units Per Store (4 Weeks Summed)
+
+---
+
+# Column Group Controls
+
+Because there are many columns, add a **Column Groups selector above the table**.
+
+Users must be able to:
+
+Toggle column groups on/off
+Expand groups to toggle individual columns
+Reorder columns
+Save configurations as **Saved Views**
+
+Example group selector:
+
+☑ Product Attribute
+☐ Logistics
+☑ Sales Units
+☑ Stock Units
+☑ WOS
+☐ Store Availability
+☐ Promotion
+☐ Orders
+☐ Sales by Store
+
+---
+
+# Default Visible Groups
+
+When the screen first loads show:
+
+Product Attribute
+Sales Units
+Stock Units
+WOS
+Store Availability
+
+Other groups remain available but hidden.
+
+---
+
+# Table Navigation
+
+Enable usability features for large tables:
+
+Horizontal scrolling
+Freeze first two columns (Rank and Style Code)
+Sticky column group headers
+Sortable columns
+Quick search on Style Code and Style Long Desc
+
+---
+
+# Risk Highlighting
+
+Add conditional formatting:
+
+Store WOS greater than 15 → red highlight
+Store WOS between 10 and 15 → orange highlight
+Availability OH less than 70 percent → yellow highlight
+
+---
+
+# Pagination
+
+Add pagination at the bottom of the table.
+
+Rows per page options:
+
+25
+50
+100
+
+Include Previous and Next navigation.
+
+---
+
+# Export
+
+Export to Excel must include **all currently visible columns**, maintaining column group structure.
+
+---
+
+# Empty State
+
+If no results match the filters:
+
+Display message:
+
+"No styles match the selected exit planning criteria."
+
+Include a **Clear Filters** button.

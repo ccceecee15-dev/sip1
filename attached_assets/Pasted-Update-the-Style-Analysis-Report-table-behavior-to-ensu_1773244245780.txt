@@ -1,0 +1,72 @@
+Update the **Style Analysis Report table behavior** to ensure that **all available columns from the dataset are included in the system**, even if they are not visible by default.
+
+### Column Availability
+
+* All columns defined in the Style Analysis dataset must exist in the table configuration.
+* Columns should be organized under their appropriate **column groups** (e.g., Basic Information, Sales Metrics, Stock Metrics, Performance Metrics, Lifecycle, etc.).
+* Some groups may be hidden by default to keep the table readable.
+
+### Column Group Selector
+
+Add a **Column Groups selector** above the table.
+
+This should allow users to:
+
+* Select which **column groups** are visible
+* Toggle groups on/off using checkboxes
+* Quickly show/hide entire groups of columns
+
+Example:
+
+Column Groups
+☑ Basic Information
+☐ Sales Metrics
+☐ Stock Metrics
+☐ Performance Metrics
+☐ Lifecycle
+
+When a group is enabled, **all columns within that group should appear in the table**.
+
+### Individual Column Control
+
+Within the **Customize Table panel**, users should also be able to:
+
+* Expand a column group
+* Select or deselect **individual columns within that group**
+
+Example:
+
+Sales Metrics
+☑ Sales Units
+☑ Sales Value
+☐ Discount %
+☐ Margin %
+
+### Default View
+
+To keep the screen usable on first load:
+
+Default visible groups should be:
+
+* Basic Information
+* Key Performance Metrics
+
+Other groups should remain available but hidden until selected.
+
+### Persistence
+
+If a user changes visible column groups or columns:
+
+* Save the configuration as a **Saved View**
+* Automatically apply the user's **last used view** when they return to the screen.
+
+### Export Behavior
+
+When exporting to Excel:
+
+* Include **only the columns currently visible in the table**
+* Maintain the column grouping order where possible.
+
+### Performance
+
+Ensure that enabling additional column groups dynamically **does not reload the entire page**. Columns should appear instantly within the existing table.

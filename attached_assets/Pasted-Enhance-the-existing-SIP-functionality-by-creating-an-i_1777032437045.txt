@@ -1,0 +1,213 @@
+Enhance the existing SIP functionality by creating an **improved version of the SIP flow**, while keeping the current implementation unchanged.
+
+---
+
+# Step 1 — Duplicate Existing SIP Flow
+
+Create a new version of the SIP flow:
+
+**Reports → SIP Planning (Enhanced)**
+
+This should be a **full duplicate of the current SIP flow**, including:
+
+* Style Analysis (with SIP Metrics)
+* Purchase Order Report (Screen 2)
+* PO Adjustment Screen (Screen 3)
+
+Do NOT modify the existing SIP screens.
+
+---
+
+# Step 2 — Upgrade “New PO Required” → “PO Priority”
+
+Replace the current **New PO Required flag** with a more informative indicator:
+
+### New Column: PO Priority
+
+Values:
+
+* 🔴 High → Critical shortage / immediate action required
+* 🟠 Medium → Upcoming shortage
+* 🟢 Low → Monitor
+
+### Behavior:
+
+* Based on deficit, WOS, or availability (mock logic is fine)
+* Use color-coded badges
+* Allow sorting by PO Priority (High → Low)
+
+---
+
+# Step 3 — Improve SIP Metrics Column Group
+
+Enhance the SIP Metrics group to include:
+
+* Deficit
+* Suggested Order Quantity
+* Weeks of Supply (WOS)
+* Sales Velocity (if available)
+
+Add **inline indicators**:
+
+* “Low WOS”
+* “High Sales”
+* “Below Safety Stock”
+
+These should appear as small tags or tooltips within the table.
+
+---
+
+# Step 4 — Improve Transition to Ordering
+
+When user clicks a row:
+
+* Only allow transition if PO Priority is High or Medium
+* Navigate to enhanced Purchase Order Report (Screen 2)
+
+---
+
+# Step 5 — Restructure Purchase Order Report (Screen 2)
+
+Do NOT change the data — only improve layout and usability.
+
+---
+
+## Section A — PO Summary (Top Panel)
+
+Add a summary section above the table:
+
+Fields:
+
+* Vendor
+* Delivery Location (Warehouse / Store)
+* Total Suggested Units
+* Total Order Value
+* MOQ Status (Met / Not Met)
+* Next Available Delivery Date
+
+---
+
+## Section B — SKU Table (Main Table)
+
+Columns:
+
+* SKU / Style
+* Description
+* Location
+* Stock
+* Sales
+* WOS
+* Suggested Order Qty
+* Editable Order Qty
+* Alerts
+
+---
+
+## Alerts Column
+
+Add inline indicators:
+
+* Out of Stock Risk
+* Negative WOS
+* Low Availability
+
+Use colored badges/icons.
+
+---
+
+# Step 6 — Default Sorting
+
+Sort table by:
+
+1. Highest Deficit
+2. Highest Sales Velocity
+
+---
+
+# Step 7 — Improve Drill-Down (Screen 2-1)
+
+Enhance the existing drill-down screen:
+
+### Behavior:
+
+Make it context-aware:
+
+* If Warehouse delivery:
+  → Show store-level demand breakdown
+
+* If Direct-to-Store:
+  → Show:
+
+  * Store stock
+  * Forecast
+  * Safety stock
+
+---
+
+### UI Enhancements:
+
+* Add clear header showing:
+  Vendor + Location + SKU/Style
+
+* Allow easy return to previous screen
+
+---
+
+# Step 8 — Improve PO Adjustment Screen (Screen 3)
+
+Enhance usability:
+
+### Add:
+
+* Total Units summary
+* Total Value summary
+* Validation checks:
+
+  * MOQ not met
+  * Negative quantities
+  * Missing SKUs
+
+---
+
+### UI Behavior:
+
+* Highlight edited values
+* Allow bulk adjustments (optional)
+
+---
+
+# Step 9 — Preserve Flexibility
+
+Do NOT restrict:
+
+* Filters
+* Column customization
+* Saved views
+
+Users must still be able to:
+
+* Customize their analytical view
+* Use SIP Planning as both analysis and execution tool
+
+---
+
+# Step 10 — UI Consistency
+
+Ensure:
+
+* Same design system as existing app
+* Same table behavior and styling
+* Responsive performance for large datasets
+
+---
+
+# Goal
+
+Create an **Enhanced SIP Planning experience** that:
+
+1. Improves prioritization (PO Priority instead of binary flag)
+2. Makes ordering decisions clearer
+3. Reduces cognitive load in Purchase Order Report
+4. Maintains flexibility for different planner workflows
+
+Without disrupting the current implementation.

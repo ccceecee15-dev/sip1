@@ -1,0 +1,105 @@
+Update the existing **Exit Planning screen** to include **drill-down views for Style and Store**, based on the Excel structure.
+
+Do not create a new screen. Extend the current screen by adding **row-level drill-down functionality**.
+
+---
+
+# Drill-Down Behavior
+
+When a user clicks on any row in the Exit Planning table (MA level):
+
+Open a **right-side drawer or expandable panel** showing detailed breakdown.
+
+This panel must include two sections:
+
+1. Markdown Details (Style-level)
+2. Store Details (Store-level)
+
+---
+
+# Section 1 — Markdown Details (Style-Level)
+
+Display a table with the following columns:
+
+Style
+Description
+Vendor
+Stock ($)
+Stock (Units)
+Distribution
+Cost Price
+Markdown Price
+Margin
+
+Example row:
+
+Style: 1301293
+Description: APPLE EARPODS WITH USBC CONNECTOR
+Vendor: INGRAM MICRO, INC.
+Stock ($): 123
+Stock (Units): 123
+Distribution: 5
+Cost Price: 23
+Markdown Price: 29
+Margin: 21%
+
+---
+
+# Section 2 — Store Details (Store-Level)
+
+Below the Markdown Details table, display store-level breakdown.
+
+Columns:
+
+Store
+Description
+Format
+Stock ($)
+Stock (Units)
+
+Example rows:
+
+124 | LICK-HORSESHOE | SPECIALTY | 11 | 1
+125 | HARLEY-LINQ | WTLV | 12 | 2
+126 | RUBY BLUE-LINQ | SPECIALTY | 13 | 3
+127 | WELCOME LAS VEGAS-FORUM SHOPS | SPECIALTY | 14 | 4
+128 | LICK-EXCALIBUR | SPECIALTY | 15 | 5
+
+---
+
+# Interaction Behavior
+
+* Clicking a row opens the panel
+* Panel should be scrollable
+* Allow closing the panel without losing table state
+* Data should correspond to the selected MA / row
+
+---
+
+# UI Consistency
+
+* Use the same table styles as existing screens
+* Keep spacing and typography consistent
+* Use card or section headers for:
+
+  * Markdown Details
+  * Store Details
+
+---
+
+# Optional Enhancement (if supported)
+
+Allow clicking a **Style row** inside Markdown Details to further filter the Store Details table to that style.
+
+---
+
+# Important
+
+Do not modify:
+
+Existing summary tables
+Column structures
+Filters
+Pagination
+
+Only add the **drill-down detail layer** so the screen matches the Excel structure.

@@ -1,0 +1,146 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index-dev.ts
+
+[1G[0K8:03:18 PM [express] serving on port 5000
+
+
+
+
+[1;1H[0J[2m8:03:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/reports/SIPPlanning.tsx[22m
+
+
+
+
+
+[1;1H[0J[2m8:03:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/reports/SIPPlanning.tsx[22m [33m(x2)[39m
+[replit-cartographer] Error processing /home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/client/src/pages/reports/SIPPlanning.tsx: SyntaxError: Expected corresponding JSX closing tag for <Fragment>. (825:24)
+    at toParseError [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parse-error.ts:95:45[90m)[39m
+    at raise [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/tokenizer/index.ts:1504:19[90m)[39m
+    at jsxParseElementAt [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:519:16[90m)[39m
+    at jsxParseElement [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:559:19[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:573:21[90m)[39m
+    at parseExprSubscripts [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:742:23[90m)[39m
+    at parseUpdate [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:721:21[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:683:23[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3872:20[90m)[39m
+    at parseMaybeUnaryOrPrivate [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:417:14[90m)[39m
+    at parseExprOps [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:429:23[90m)[39m
+    at parseMaybeConditional [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:384:23[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:301:21[90m)[39m
+    at fn [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3724:23[90m)[39m
+    at tryParse [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/util.ts:174:20[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3723:20[90m)[39m
+    at callback [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:257:12[90m)[39m
+    at allowInAnd [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:3194:12[90m)[39m
+    at parseMaybeAssignAllowIn [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:256:17[90m)[39m
+    at parseMaybeAssignAllowInOrVoidPattern [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:3308:17[90m)[39m
+    at parseParenAndDistinguishExpression [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1822:16[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1170:21[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:583:22[90m)[39m
+    at parseExprSubscripts [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:742:23[90m)[39m
+    at parseUpdate [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:721:21[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:683:23[90m)[39m
+    at parseMaybeUnary [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3872:20[90m)[39m
+    at parseMaybeUnaryOrPrivate [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:417:14[90m)[39m
+    at parseExprOps [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:429:23[90m)[39m
+    at parseMaybeConditional [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:384:23[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:301:21[90m)[39m
+    at parseMaybeAssign [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3743:22[90m)[39m
+    at parseExpressionBase [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:226:23[90m)[39m
+    at callback [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:217:39[90m)[39m
+    at allowInAnd [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:3189:16[90m)[39m
+    at parseExpression [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:217:17[90m)[39m
+    at parseReturnStatement [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1115:28[90m)[39m
+    at parseStatementContent [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:543:21[90m)[39m
+    at parseStatementContent [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/typescript/index.ts:3219:20[90m)[39m
+    at parseStatementLike [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:482:17[90m)[39m
+    at parseStatementListItem [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:431:17[90m)[39m
+    at parseBlockOrModuleBlockBody [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1444:16[90m)[39m
+    at parseBlockBody [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1417:10[90m)[39m
+    at parseBlock [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/statement.ts:1385:10[90m)[39m
+    at parseFunctionBody [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:2618:24[90m)[39m
+    at parseArrowExpression [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:2559:10[90m)[39m
+    at parseParenAndDistinguishExpression [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1847:12[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:1170:21[90m)[39m
+    at parseExprAtom [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/plugins/jsx/index.ts:583:22[90m)[39m
+    at parseExprSubscripts [90m(/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/[39mnode_modules/[4m@babel/parser[24m/src/parser/expression.ts:742:23[90m)[39m {
+  code: [32m'BABEL_PARSER_SYNTAX_ERROR'[39m,
+  reasonCode: [32m'MissingClosingTagElement'[39m,
+  loc: Position { line: [33m825[39m, column: [33m24[39m, index: [33m44505[39m },
+  pos: [33m44505[39m,
+  syntaxPlugin: [32m'jsx'[39m
+}
+
+
+
+
+
+[1;1H[0J[2m8:03:57 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: /home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/client/src/pages/reports/SIPPlanning.tsx: Expected corresponding JSX closing tag for <Fragment>. (825:24)
+
+[0m [90m 823 |[31m                             [33m<[31m[33m/[31m[33mtr[31m[33m>[31m
+ [90m 824 |[31m                           )}
+[31m[1m>[22m[31m[90m 825 |[31m                         [33m<[31m[33m/[31m[33m>[31m
+ [90m     |[31m                         [31m[1m^[22m[31m
+ [90m 826 |[31m                       )[33m;[31m
+ [90m 827 |[31m                     })}
+ [90m 828 |[31m                   [33m<[31m[33m/[31m[33mtbody[31m[33m>[31m[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36m/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/client/src/pages/reports/SIPPlanning.tsx[39m:825:24
+[33m  823 |                              </tr>
+  824 |                            )}
+  825 |                          </>
+      |                          ^
+  826 |                        );
+  827 |                      })}[39m
+      at toParseError (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/tokenizer/index.ts:1504:19)
+      at jsxParseElementAt (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/jsx/index.ts:519:16)
+      at jsxParseElement (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:742:23)
+      at parseUpdate (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at parseMaybeUnary (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at parseMaybeUnary (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/typescript/index.ts:3872:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at parseExprOps (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at parseMaybeConditional (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at parseMaybeAssign (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at fn (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/typescript/index.ts:3724:23)
+      at tryParse (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/util.ts:174:20)
+      at parseMaybeAssign (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/typescript/index.ts:3723:20)
+      at callback (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:257:12)
+      at allowInAnd (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:3194:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:256:17)
+      at parseMaybeAssignAllowInOrVoidPattern (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:3308:17)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:1822:16)
+      at parseExprAtom (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:1170:21)
+      at parseExprAtom (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:742:23)
+      at parseUpdate (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at parseMaybeUnary (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at parseMaybeUnary (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/typescript/index.ts:3872:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at parseExprOps (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at parseMaybeConditional (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at parseMaybeAssign (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/typescript/index.ts:3743:22)
+      at parseExpressionBase (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at callback (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at allowInAnd (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:3189:16)
+      at parseExpression (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at parseReturnStatement (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:1115:28)
+      at parseStatementContent (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:543:21)
+      at parseStatementContent (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/typescript/index.ts:3219:20)
+      at parseStatementLike (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:482:17)
+      at parseStatementListItem (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:431:17)
+      at parseBlockOrModuleBlockBody (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:1444:16)
+      at parseBlockBody (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:1417:10)
+      at parseBlock (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/statement.ts:1385:10)
+      at parseFunctionBody (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:2618:24)
+      at parseArrowExpression (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:2559:10)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:1847:12)
+      at parseExprAtom (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:1170:21)
+      at parseExprAtom (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/v92zipzip/v92zip/v92/v91mxzipzip/v91mxzip/v91mx/almost/screensOneBzipzip/node_modules/@babel/parser/src/parser/expression.ts:742:23)
+[1G[0K⠙[1G[0K

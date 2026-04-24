@@ -1,0 +1,187 @@
+Update the **Style Analysis Report** to use the exact column groupings and columns defined in the Style Analysis spreadsheet.
+
+The table must support **grouped headers**, where each group represents a logical section of the dataset.
+
+All columns listed below must be available in the table configuration, even if they are not visible by default.
+
+---
+
+# Column Groups and Fields
+
+### Product Attribute
+
+* Rank
+* TOP Bucket
+* Style Code
+* Style Long Desc
+* Brand
+* UPC Number – Vendor (Latest UPC only)
+* Style Chain Current Retail
+* Primary Vendor Code
+* Primary Vendor Name
+* Primary Vendor Style
+* PLC Status
+* RTV ATTRIBUTE
+* Style Reorderable Flag
+* Style Chain Current Retail
+* Primary Current Cost
+
+---
+
+### Logistics
+
+* Style Height
+* Style Width
+* Style Depth
+* Style Weight
+
+---
+
+### Sales Units
+
+* WTD
+* LW
+* L2W
+* L3W
+* L4W
+* Avg Weekly Sales
+* Total Year Sales
+
+---
+
+### Stock Units
+
+* Presentation Stock
+* Store Onhand
+* Store Intransit
+* DC Onhand
+* DC Allocation
+
+---
+
+### WOS
+
+* Store WOS
+* WH WOS
+
+---
+
+### Store Availability
+
+* Availability OH %
+* WOW Availability Change
+
+---
+
+### Promotion
+
+* Style Price Status Code
+* Style Price Status Description
+* Style Promo Flag
+
+---
+
+### Orders
+
+* Style Order Multiple
+* Style Distribution Multiple
+* First Receipt Date
+* Last Receipt Date
+* GR Units (Last 8 weeks)
+* On Order Units (Last 8 Weeks)
+* On Order Units (Total)
+
+---
+
+### Sales by Store
+
+* Count of Stores With Pres Stock
+* Sales Units Per Store (1 Week Ago)
+* Sales Units Per Store (2 Weeks Ago)
+* Sales Units Per Store (3 Weeks Ago)
+* Sales Units Per Store (4 Weeks Ago)
+* Sales Units Per Store (4 Weeks Ago Summed)
+
+---
+
+# Table Behavior
+
+Because the table contains many columns:
+
+### Column Group Selector
+
+Add a **Column Groups control above the table** where users can toggle visibility of each group.
+
+Example:
+
+Column Groups
+☑ Product Attribute
+☐ Logistics
+☐ Sales Units
+☐ Stock Units
+☐ WOS
+☐ Store Availability
+☐ Promotion
+☐ Orders
+☐ Sales by Store
+
+When a group is enabled, **all columns within that group should appear in the table**.
+
+---
+
+### Default View
+
+Default visible groups:
+
+* Product Attribute
+* Sales Units
+* Stock Units
+
+All other groups should remain available but hidden.
+
+---
+
+### Horizontal Navigation
+
+Because of the width of the table:
+
+* Enable horizontal scrolling
+* Freeze the first two columns:
+
+  * Rank
+  * Style Code
+
+---
+
+### Group Headers
+
+The table should show **two header rows**:
+
+Row 1 → Column Group Name
+Row 2 → Individual Column Names
+
+Example:
+
+| Product Attribute | Product Attribute | Product Attribute | Sales Units | Sales Units |
+| ----------------- | ----------------- | ----------------- | ----------- | ----------- |
+| Rank              | Style Code        | Brand             | WTD         | LW          |
+
+---
+
+### Pagination
+
+Add pagination at the bottom:
+
+Rows per page:
+
+* 25
+* 50
+* 100
+
+Include Previous / Next navigation.
+
+---
+
+### Export
+
+Export to Excel should include **all currently visible columns**, maintaining the column group structure.

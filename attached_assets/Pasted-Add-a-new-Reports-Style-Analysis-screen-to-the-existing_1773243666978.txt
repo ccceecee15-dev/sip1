@@ -1,0 +1,185 @@
+Add a new **Reports → Style Analysis** screen to the existing application. The UI must use the **same layout, components, theme, and spacing patterns already used in the app** so the screen feels like a natural extension of the current product.
+
+Because this report contains **a large number of columns organized into groups**, the table must include **customization controls so users can easily manage what they see**.
+
+---
+
+### Navigation
+
+Add **Style Analysis** under the existing **Reports** section in the sidebar.
+
+---
+
+# Screen Layout
+
+### Header
+
+Title: **Style Analysis Report**
+
+Right side actions:
+
+* Export to Excel
+* Save View
+* Reset Filters
+
+---
+
+# Filters Section
+
+Place a filter panel at the top of the screen using the same filter UI already used in other reports.
+
+Filters:
+
+* Category (dropdown)
+* Sub Category (dropdown)
+* Merchandise Area (dropdown)
+* Planning Group (dropdown)
+* Vendor (dropdown)
+* PLC Status (dropdown)
+* Style Code / Style Name (search field)
+
+Buttons:
+
+* Apply Filters
+* Clear Filters
+
+---
+
+# Results Table
+
+The results should display in a **wide analytical table with grouped columns**.
+
+Example column structure:
+
+Basic Information
+
+* Style Code
+* Style Name
+* Vendor
+* Category
+* Sub Category
+
+Sales Metrics
+
+* Sales Units
+* Sales Value
+* Margin %
+
+Stock Metrics
+
+* Current Stock
+* In Transit
+* Available Stock
+
+Performance Metrics
+
+* Sell Through %
+* Weeks of Cover
+* Aging
+
+Lifecycle
+
+* PLC Status
+* Launch Date
+
+---
+
+# Table Navigation for Large Data
+
+Because the report contains many columns, implement the following usability features:
+
+### Horizontal Navigation
+
+* Enable horizontal scrolling
+* Freeze the first **two columns (Style Code and Style Name)**
+
+---
+
+### Column Group Toggle
+
+Each column group should be **collapsible**.
+
+Example:
+
+▶ Sales Metrics
+▶ Stock Metrics
+▶ Performance Metrics
+▶ Lifecycle
+
+Users can expand or collapse groups to reduce visual clutter.
+
+---
+
+### Column Customization Panel
+
+Add a **"Customize Table" button** above the table.
+
+This opens a side panel where users can:
+
+* Show / hide column groups
+* Show / hide individual columns
+* Reorder columns using drag-and-drop
+* Save the configuration as a **Saved View**
+
+Example saved views:
+
+* Merchandising View
+* Inventory View
+* Performance View
+
+---
+
+### Sticky Header
+
+Table headers and column group labels should stay fixed when scrolling vertically.
+
+---
+
+### Compact Mode
+
+Use a slightly reduced row height so more rows fit on screen.
+
+---
+
+# Pagination
+
+Add pagination at the bottom of the table.
+
+Controls:
+
+* Rows per page: 25 / 50 / 100
+* Previous / Next buttons
+* Page number indicator
+
+---
+
+# Sorting and Search
+
+* Allow sorting on all numeric columns
+* Allow quick search on **Style Code and Style Name**
+
+---
+
+# Export
+
+The **Export to Excel** button should export the **current filtered dataset with visible columns**.
+
+---
+
+# Empty State
+
+If no records match the filters:
+
+Show message:
+
+"No styles match the selected filters."
+
+Include a **Clear Filters** button.
+
+---
+
+# UI Consistency
+
+* Use the same **table components, filter design, and buttons already present in the app**
+* Maintain consistent spacing and responsiveness
+* Ensure the screen performs well even with **large datasets and many columns**

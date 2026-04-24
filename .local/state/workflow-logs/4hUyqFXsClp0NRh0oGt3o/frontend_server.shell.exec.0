@@ -1,0 +1,75 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index-dev.ts
+
+[1G[0K7:49:54 PM [express] serving on port 5000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m8:02:31 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+
+
+
+
+
+[1;1H[0J[2m8:02:33 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+[1;1H[0J[2m8:03:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/layout/Sidebar.tsx[22m
+
+
+
+
+
+
+
+[1;1H[0J[2m8:03:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/planning/DrillBar.tsx[22m
