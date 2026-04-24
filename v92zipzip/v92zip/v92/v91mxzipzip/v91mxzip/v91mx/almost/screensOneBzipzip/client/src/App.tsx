@@ -20,6 +20,7 @@ import DeficitByLocation from "@/pages/reports/DeficitByLocation";
 import CreatePO from "@/pages/reports/CreatePO";
 import StyleStores from "@/pages/reports/StyleStores";
 import StoreSkus from "@/pages/reports/StoreSkus";
+import WarehouseSkus from "@/pages/reports/WarehouseSkus";
 import SIPPlanningEnhanced from "@/pages/reports/SIPPlanningEnhanced";
 import CreatePOEnhanced from "@/pages/reports/CreatePOEnhanced";
 import StyleExceptionManagement from "@/pages/rap/StyleExceptionManagement";
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/reports/sip-planning/deficit-by-location" component={DeficitByLocation} />
       <Route path="/reports/sip-planning/style-stores" component={StyleStores} />
       <Route path="/reports/sip-planning/store-skus" component={StoreSkus} />
+      <Route path="/reports/sip-planning/warehouse-skus" component={WarehouseSkus} />
       <Route path="/reports/sip-planning/create-po" component={CreatePO} />
       <Route path="/reports/sip-planning-enhanced" component={SIPPlanningEnhanced} />
       <Route path="/reports/sip-planning-enhanced/create-po" component={CreatePOEnhanced} />
