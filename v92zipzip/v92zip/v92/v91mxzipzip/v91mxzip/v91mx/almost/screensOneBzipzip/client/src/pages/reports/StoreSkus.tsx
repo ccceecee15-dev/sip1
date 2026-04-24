@@ -220,9 +220,18 @@ export default function StoreSkus() {
     );
   };
 
+  const buildCreatePoUrl = () =>
+    `/reports/sip-planning/create-po?vendor=${encodeURIComponent(vendorName)}` +
+    `&vendorCode=${vendorCode}` +
+    `&loc=store` +
+    `&code=${encodeURIComponent(storeId)}` +
+    `&name=${encodeURIComponent(storeName)}` +
+    `&style=${styleCode}` +
+    `&desc=${encodeURIComponent(styleDesc)}`;
+
   const openCreatePO = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigate(`/reports/sip-planning/create-po?vendor=${encodeURIComponent(vendorName)}`);
+    navigate(buildCreatePoUrl());
   };
 
   return (
@@ -251,7 +260,7 @@ export default function StoreSkus() {
             </div>
             <Button
               size="sm" className="gap-1.5 text-xs font-bold bg-primary shrink-0"
-              onClick={() => navigate(`/reports/sip-planning/create-po?vendor=${encodeURIComponent(vendorName)}`)}
+              onClick={() => navigate(buildCreatePoUrl())}
             >
               <ShoppingCart size={13} /> Create PO for {vendorName.split(",")[0]}
             </Button>

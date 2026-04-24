@@ -276,7 +276,10 @@ export default function DeficitByLocation() {
                     </div>
                     <Button
                       size="sm" className="h-8 text-xs gap-1.5 bg-primary shrink-0"
-                      onClick={() => navigate(`/reports/sip-planning/create-po?vendor=${encodeURIComponent(group.vendor.name)}`)}
+                      onClick={() => navigate(
+                        `/reports/sip-planning/create-po?vendor=${encodeURIComponent(group.vendor.name)}` +
+                        `&vendorCode=${group.vendor.code}`
+                      )}
                     >
                       <ShoppingCart size={13} /> Create PO
                     </Button>

@@ -332,9 +332,12 @@ export default function WarehouseSkus() {
     navigate(
       `/reports/sip-planning/create-po?vendor=${encodeURIComponent(vendorName)}` +
       `&vendorCode=${vendorCode}` +
-      `&wh=${encodeURIComponent(whCode)}` +
-      `&whName=${encodeURIComponent(whName)}` +
-      `&style=${styleCode}`
+      `&loc=warehouse` +
+      `&code=${encodeURIComponent(whCode)}` +
+      `&name=${encodeURIComponent(whName)}` +
+      `&region=${encodeURIComponent(region)}` +
+      `&style=${styleCode}` +
+      `&desc=${encodeURIComponent(styleDesc)}`
     );
   };
 

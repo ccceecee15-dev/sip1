@@ -8,11 +8,25 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   ChevronLeft, ShoppingCart, CheckCircle2,
-  Package, AlertCircle, Search,
+  Package, AlertCircle, Search, Warehouse, Store, MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ─── SKU-level mock data per vendor ───────────────────────────────────────────
+// ─── Seeded RNG (matches StyleStores / WarehouseSkus) ─────────────────────────
+function hashStr(str: string): number {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+function seededRng(seed: number) {
+  let s = seed | 0;
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) | 0;
+    return (s >>> 0) / 4294967296;
+  };
+}
+
+// ─── SKU-level mock catalogue per vendor ──────────────────────────────────────
 interface SkuLine {
   upc:          string;
   styleCode:    string;
@@ -84,57 +98,105 @@ const VENDOR_SKUS: Record<string, SkuLine[]> = {
 const DEFAULT_VENDOR   = "INGRAM MICRO, INC.";
 const ALL_VENDOR_NAMES = Object.keys(VENDOR_SKUS);
 
+// ─── Per-delivery-point deficit generator ────────────────────────────────────
+// Deterministic per (deliveryPointKey, upc). Returns 0 ⇒ SKU not in deficit at
+// this delivery point (filtered out).
+function deliveryPointDeficit(
+  dpKey: string,
+  upc: string,
+  baseSuggested: number,
+  multiple: number,
+): { deficit: number; suggestedQty: number } {
+  const rng = seededRng(hashStr(dpKey + "::" + upc));
+  if (rng() < 0.30) return { deficit: 0, suggestedQty: 0 };
+  const scale       = 0.08 + rng() * 0.32;
+  const rawDeficit  = Math.max(1, Math.round(baseSuggested * 0.85 * scale));
+  const suggestedQty = Math.ceil(rawDeficit / Math.max(1, multiple)) * Math.max(1, multiple);
+  return { deficit: rawDeficit, suggestedQty };
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CreatePO() {
   const [location, navigate] = useLocation();
 
-  const vendorFromUrl = useMemo(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("vendor") ?? DEFAULT_VENDOR;
+  // Parse all URL params once per location change
+  const urlParams = useMemo(() => {
+    const p = new URLSearchParams(window.location.search);
+    return {
+      vendor:     p.get("vendor")     ?? DEFAULT_VENDOR,
+      vendorCode: p.get("vendorCode") ?? "",
+      loc:        (p.get("loc") ?? "").toLowerCase(),     // "warehouse" | "store" | ""
+      code:       p.get("code")       ?? "",              // whCode or storeId
+      name:       p.get("name")       ?? "",              // whName or storeName
+      region:     p.get("region")     ?? "",
+      style:      p.get("style")      ?? "",
+      desc:       p.get("desc")       ?? "",
+    };
   }, [location]);
 
-  const [vendor, setVendor]     = useState(vendorFromUrl);
-  const [search, setSearch]     = useState("");
+  const [vendor, setVendor]       = useState(urlParams.vendor);
+  const [search, setSearch]       = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [poNumber] = useState(
     () => `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 90000) + 10000)}`
   );
 
-  const rawSkus = VENDOR_SKUS[vendor] ?? VENDOR_SKUS[DEFAULT_VENDOR];
+  // Resolve effective delivery point (only when loc + name provided)
+  const deliveryPoint = useMemo(() => {
+    if (!urlParams.loc || !urlParams.name) return null;
+    return {
+      kind:   urlParams.loc as "warehouse" | "store",
+      code:   urlParams.code,
+      name:   urlParams.name,
+      region: urlParams.region,
+    };
+  }, [urlParams]);
 
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(rawSkus.map((s) => s.upc)));
+  // SKUs for the chosen vendor, with per-delivery-point deficit applied (and filtered)
+  const dpSkus = useMemo<SkuLine[]>(() => {
+    const base = VENDOR_SKUS[vendor] ?? VENDOR_SKUS[DEFAULT_VENDOR];
+    if (!deliveryPoint) return base; // legacy / "all vendor" mode
+    const dpKey = `${deliveryPoint.kind}:${deliveryPoint.code || deliveryPoint.name}`;
+    return base
+      .map((s) => {
+        const { deficit, suggestedQty } = deliveryPointDeficit(
+          dpKey, s.upc, s.suggestedQty, s.orderMultiple,
+        );
+        return { ...s, deficit, suggestedQty };
+      })
+      .filter((s) => s.deficit > 0);
+  }, [vendor, deliveryPoint]);
+
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(dpSkus.map((s) => s.upc)));
   const [editQty, setEditQty]   = useState<Record<string, number>>(
-    () => Object.fromEntries(rawSkus.map((s) => [s.upc, s.suggestedQty]))
+    () => Object.fromEntries(dpSkus.map((s) => [s.upc, s.suggestedQty]))
   );
 
   useEffect(() => {
-    const skus = VENDOR_SKUS[vendor] ?? VENDOR_SKUS[DEFAULT_VENDOR];
-    setSelected(new Set(skus.map((s) => s.upc)));
-    setEditQty(Object.fromEntries(skus.map((s) => [s.upc, s.suggestedQty])));
+    setSelected(new Set(dpSkus.map((s) => s.upc)));
+    setEditQty(Object.fromEntries(dpSkus.map((s) => [s.upc, s.suggestedQty])));
     setSearch("");
     setSubmitted(false);
-  }, [vendor]);
+  }, [dpSkus]);
 
   const filteredSkus = useMemo(() => {
-    const skus = VENDOR_SKUS[vendor] ?? VENDOR_SKUS[DEFAULT_VENDOR];
-    if (!search.trim()) return skus;
+    if (!search.trim()) return dpSkus;
     const q = search.trim().toLowerCase();
-    return skus.filter(
+    return dpSkus.filter(
       (s) =>
         s.upc.includes(q) ||
         s.styleCode.includes(q) ||
         s.variant.toLowerCase().includes(q) ||
         s.description.toLowerCase().includes(q)
     );
-  }, [vendor, search]);
+  }, [dpSkus, search]);
 
-  const allSkus     = VENDOR_SKUS[vendor] ?? VENDOR_SKUS[DEFAULT_VENDOR];
-  const allSelected = selected.size === allSkus.length;
-  const someSelected = selected.size > 0 && selected.size < allSkus.length;
+  const allSelected  = selected.size === dpSkus.length && dpSkus.length > 0;
+  const someSelected = selected.size > 0 && selected.size < dpSkus.length;
 
   const toggleAll = () => {
-    if (selected.size === allSkus.length) setSelected(new Set());
-    else setSelected(new Set(allSkus.map((s) => s.upc)));
+    if (selected.size === dpSkus.length) setSelected(new Set());
+    else setSelected(new Set(dpSkus.map((s) => s.upc)));
   };
 
   const toggleSku = (upc: string) =>
@@ -156,12 +218,12 @@ export default function CreatePO() {
   };
 
   const summary = useMemo(() => {
-    const selectedSkus  = allSkus.filter((s) => selected.has(s.upc));
-    const totalQty      = selectedSkus.reduce((sum, s) => sum + (editQty[s.upc] ?? 0), 0);
-    const totalCost     = selectedSkus.reduce((sum, s) => sum + (editQty[s.upc] ?? 0) * s.cost, 0);
-    const totalDeficit  = selectedSkus.reduce((sum, s) => sum + s.deficit, 0);
-    return { count: selectedSkus.length, totalQty, totalCost, totalDeficit };
-  }, [selected, editQty, allSkus]);
+    const sel          = dpSkus.filter((s) => selected.has(s.upc));
+    const totalQty     = sel.reduce((sum, s) => sum + (editQty[s.upc] ?? 0), 0);
+    const totalCost    = sel.reduce((sum, s) => sum + (editQty[s.upc] ?? 0) * s.cost, 0);
+    const totalDeficit = sel.reduce((sum, s) => sum + s.deficit, 0);
+    return { count: sel.length, totalQty, totalCost, totalDeficit };
+  }, [selected, editQty, dpSkus]);
 
   if (submitted) {
     return (
@@ -175,6 +237,12 @@ export default function CreatePO() {
             <p className="text-sm text-slate-500 mt-1">
               PO Number: <span className="font-mono font-bold text-primary">{poNumber}</span>
             </p>
+            {deliveryPoint && (
+              <p className="text-xs text-slate-400 mt-1">
+                Ship to <span className="font-semibold text-slate-600">{deliveryPoint.name}</span>
+                {deliveryPoint.code && <> ({deliveryPoint.code})</>}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-4 p-5 rounded-xl bg-slate-50 border border-border/50 min-w-[340px]">
             <div className="text-center flex-1 border-r border-border/50">
@@ -205,6 +273,13 @@ export default function CreatePO() {
     );
   }
 
+  const dpIcon       = deliveryPoint?.kind === "warehouse" ? Warehouse : Store;
+  const DpIcon       = dpIcon;
+  const dpKindLabel  = deliveryPoint?.kind === "warehouse" ? "Warehouse" : "Direct-Shipped Store";
+  const dpAccentBg   = deliveryPoint?.kind === "warehouse" ? "bg-violet-50"  : "bg-blue-50";
+  const dpAccentText = deliveryPoint?.kind === "warehouse" ? "text-violet-700" : "text-blue-700";
+  const dpAccentBorder = deliveryPoint?.kind === "warehouse" ? "border-violet-200" : "border-blue-200";
+
   return (
     <MainLayout>
       <div className="space-y-5 animate-in fade-in duration-500">
@@ -220,11 +295,69 @@ export default function CreatePO() {
             </button>
             <h1 className="text-xl font-bold tracking-tight text-slate-900">Create Purchase Order</h1>
             <p className="text-sm text-slate-500 mt-0.5">
-              {allSkus.length} SKUs with deficit · Select and adjust quantities before submitting
+              {deliveryPoint
+                ? <>{dpSkus.length} SKU{dpSkus.length === 1 ? "" : "s"} in deficit at this delivery point · Adjust quantities and submit</>
+                : <>{dpSkus.length} SKUs with deficit · Select and adjust quantities before submitting</>}
             </p>
           </div>
           <Badge variant="outline" className="text-[11px] h-7 px-3 font-mono self-start mt-1">{poNumber}</Badge>
         </div>
+
+        {/* Delivery Point Card */}
+        {deliveryPoint && (
+          <Card className={cn("border shadow-none", dpAccentBorder, dpAccentBg)}>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-white border", dpAccentBorder)}>
+                    <DpIcon size={18} className={dpAccentText} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Ship To · {dpKindLabel}</p>
+                      {deliveryPoint.code && (
+                        <Badge variant="outline" className={cn("text-[10px] h-5 px-1.5 font-mono", dpAccentBg, dpAccentText, dpAccentBorder)}>
+                          {deliveryPoint.code}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-base font-bold text-slate-800 mt-0.5 truncate">{deliveryPoint.name}</p>
+                    <div className="flex items-center gap-3 mt-1 flex-wrap text-[11px] text-slate-500">
+                      {deliveryPoint.region && (
+                        <span className="flex items-center gap-1">
+                          <MapPin size={10} className="text-slate-400" />
+                          Region: <strong className="text-slate-700">{deliveryPoint.region}</strong>
+                        </span>
+                      )}
+                      <span>Vendor: <strong className="text-slate-700">{vendor}</strong>{urlParams.vendorCode && <> ({urlParams.vendorCode})</>}</span>
+                      {urlParams.style && (
+                        <span>Origin Style: <span className="font-mono font-semibold text-primary">{urlParams.style}</span></span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-5 flex-shrink-0">
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">SKUs in Deficit</p>
+                    <p className="text-lg font-bold text-slate-800 tabular-nums">{dpSkus.length}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Total Deficit</p>
+                    <p className="text-lg font-bold text-red-600 tabular-nums">
+                      {dpSkus.reduce((s, x) => s + x.deficit, 0).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide">Suggested Units</p>
+                    <p className="text-lg font-bold text-emerald-700 tabular-nums">
+                      {dpSkus.reduce((s, x) => s + x.suggestedQty, 0).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Vendor + Search */}
         <Card className="border-border/60 shadow-none">
@@ -348,7 +481,6 @@ export default function CreatePO() {
                                 <AlertCircle
                                   size={12}
                                   className="text-amber-500 flex-shrink-0"
-                                  title={`Below MOQ (${s.moq})`}
                                 />
                               )}
                               <Input
@@ -373,7 +505,9 @@ export default function CreatePO() {
                     {filteredSkus.length === 0 && (
                       <tr>
                         <td colSpan={11} className="py-10 text-center text-xs text-slate-400">
-                          No SKUs match your search.
+                          {dpSkus.length === 0
+                            ? "No SKUs from this vendor are in deficit at this delivery point."
+                            : "No SKUs match your search."}
                         </td>
                       </tr>
                     )}
@@ -401,13 +535,21 @@ export default function CreatePO() {
                       {vendor.split(",")[0]}
                     </span>
                   </div>
+                  {deliveryPoint && (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs text-slate-500 flex-shrink-0">Ship To</span>
+                      <span className="text-[11px] font-bold text-slate-700 text-right truncate max-w-[140px]" title={deliveryPoint.name}>
+                        {deliveryPoint.name}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">PO Number</span>
                     <span className="text-[11px] font-mono font-bold text-primary">{poNumber}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">SKUs Selected</span>
-                    <span className="text-sm font-bold text-slate-800">{summary.count} / {allSkus.length}</span>
+                    <span className="text-sm font-bold text-slate-800">{summary.count} / {dpSkus.length}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">Total Deficit</span>
@@ -447,12 +589,12 @@ export default function CreatePO() {
                   <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide mb-1">Checklist</p>
                   {[
                     "All quantities above MOQ",
-                    "Quantities are order-multiple aligned",
-                    "Correct vendor selected",
+                    "Quantities snap to order multiple",
+                    "Vendor terms confirmed",
                   ].map((item) => (
-                    <div key={item} className="flex items-start gap-1.5 mt-1.5">
-                      <CheckCircle2 size={11} className="text-amber-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-[10px] text-amber-700">{item}</span>
+                    <div key={item} className="flex items-center gap-1.5 text-[10px] text-amber-800 py-0.5">
+                      <CheckCircle2 size={10} className="text-amber-500 flex-shrink-0" />
+                      {item}
                     </div>
                   ))}
                 </CardContent>
