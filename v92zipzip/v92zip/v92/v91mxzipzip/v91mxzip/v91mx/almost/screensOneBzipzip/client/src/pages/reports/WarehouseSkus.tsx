@@ -29,31 +29,31 @@ function seededRng(seed: number) {
 
 // ─── Mock store + warehouse data (kept in sync with StyleStores) ─────────────
 const STORE_POOL = [
-  { name: "TECH CENTRAL-DOWNTOWN",       format: "FLAGSHIP"  },
-  { name: "GADGET ZONE-LAKESIDE",        format: "STANDARD"  },
-  { name: "DIGITAL HUB-CANARY WHARF",   format: "FLAGSHIP"  },
-  { name: "SMART STORE-BLUEWATER",      format: "STANDARD"  },
-  { name: "MOBILE WORLD-WESTFIELD",     format: "STANDARD"  },
-  { name: "CONNECT-HEATHROW T5",        format: "TRAVEL"    },
-  { name: "TECH WORLD-BULLRING",        format: "FLAGSHIP"  },
-  { name: "MOBILE PLUS-TRAFFORD CTR",   format: "STANDARD"  },
-  { name: "CONNECT-GATWICK SOUTH",      format: "TRAVEL"    },
-  { name: "TECH HUB-GLASGOW BUCHANAN",  format: "FLAGSHIP"  },
-  { name: "LICK-HORSESHOE",             format: "SPECIALTY" },
-  { name: "HARLEY-LINQ",                format: "WTLV"      },
-  { name: "RUBY BLUE-LINQ",             format: "SPECIALTY" },
-  { name: "LICK-EXCALIBUR",             format: "SPECIALTY" },
-  { name: "GADGET PRO-BRAEHEAD",        format: "STANDARD"  },
-  { name: "CONNECT-STANSTED",           format: "TRAVEL"    },
-  { name: "MOBILE CENTRAL-ARNDALE",     format: "STANDARD"  },
-  { name: "CONNECT-EDINBURGH AIRPORT",  format: "TRAVEL"    },
+  { name: "TECH CENTRAL-JFK T4",            format: "TRAVEL"    },
+  { name: "GADGET ZONE-LAX T7",             format: "TRAVEL"    },
+  { name: "DIGITAL HUB-ATL CONCOURSE B",    format: "FLAGSHIP"  },
+  { name: "SMART STORE-ORD T2",             format: "STANDARD"  },
+  { name: "MOBILE WORLD-DFW TERMINAL D",    format: "STANDARD"  },
+  { name: "CONNECT-DEN A-WEST",             format: "TRAVEL"    },
+  { name: "TECH WORLD-SFO INTL G",          format: "FLAGSHIP"  },
+  { name: "MOBILE PLUS-SEA CENTRAL",        format: "STANDARD"  },
+  { name: "CONNECT-MIA NORTH",              format: "TRAVEL"    },
+  { name: "TECH HUB-LAS T1",                format: "FLAGSHIP"  },
+  { name: "LICK-HORSESHOE",                 format: "SPECIALTY" },
+  { name: "HARLEY-LINQ",                    format: "WTLV"      },
+  { name: "RUBY BLUE-LINQ",                 format: "SPECIALTY" },
+  { name: "LICK-EXCALIBUR",                 format: "SPECIALTY" },
+  { name: "GADGET PRO-BOS C-INTL",          format: "STANDARD"  },
+  { name: "CONNECT-IAH TERMINAL E",         format: "TRAVEL"    },
+  { name: "MOBILE CENTRAL-EWR C",           format: "STANDARD"  },
+  { name: "CONNECT-MCO B-AIRSIDE",          format: "TRAVEL"    },
 ];
 
 const WAREHOUSE_POOL = [
-  { code: "DC-NORTH",    name: "Sheffield DC",    region: "North"    },
-  { code: "DC-SOUTH",    name: "Reading DC",      region: "South"    },
-  { code: "DC-MIDLANDS", name: "Birmingham DC",   region: "Midlands" },
-  { code: "DC-EAST",     name: "Norwich DC",      region: "East"     },
+  { code: "DC-NORTHEAST", name: "Newark DC",   region: "Northeast" },
+  { code: "DC-SOUTHEAST", name: "Atlanta DC",  region: "Southeast" },
+  { code: "DC-CENTRAL",   name: "Memphis DC",  region: "Central"   },
+  { code: "DC-WEST",      name: "Ontario DC",  region: "West"      },
 ];
 
 // Must match StyleStores.assignWarehouse — keep in sync
